@@ -2,6 +2,16 @@
 
 Bu dosya [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) biçimini izler. Sürüm numaraları [Semantic Versioning](https://semver.org/lang/tr/) kullanır.
 
+## [1.2.0] - 2026-11-19
+
+### Eklendi
+
+- **Panodakileri gizle** — silme panosuna alınan dosyalar sonuç listesinden çıkarılır; dosya sayısı, tür çipleri, çift grubu sayısı ve kazanılabilir alan yeniden hesaplanır. Panodan çıkarınca geri gelir. Filtre çubuğundaki anahtarla kapatılabilir (varsayılan açık).
+- **Ana ekranda çoklu seçim** — her satırda seçim kutusu; **Tümünü seç** ve **Kopyaları seç** (her gruptan bir kopya korunur, fazlalıklar işaretlenir) kısayolları.
+- **Seçili dosyalarla toplu işlem** — **Panoya al**, **Sil** (onaylı, Geri Dönüşüm Kutusu varsayılan) ve **Adlandır** (toplu yeniden adlandırma); silme/adlandırma panellerinde "Seçilenler" kapsamı.
+
+[1.2.0]: https://github.com/ruhitemel/ikiz/releases/tag/v1.2.0
+
 ## [1.1.1] - 2026-11-19
 
 ### Düzeltildi

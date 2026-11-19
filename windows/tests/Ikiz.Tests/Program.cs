@@ -86,6 +86,16 @@ var pathSearch = index.Search(new SearchRequest { Text = "c:\\d", SearchPath = t
 Check("yol araması bulur", pathSearch.MatchedCount == 1, pathSearch.MatchedCount.ToString());
 Check("yol araması kapalıyken bulmaz", index.Search(new SearchRequest { Text = "c:\\d", SearchPath = false }).MatchedCount == 0);
 
+Console.WriteLine("Panodakileri gizleme");
+var hiddenOne = index.Search(new SearchRequest { HiddenIds = new HashSet<int> { 2 } });
+Check("gizlenen kopya eşleşme sayısını düşürür", hiddenOne.MatchedCount == 4, hiddenOne.MatchedCount.ToString());
+Check("tek kopya kalan grup listelenmez", hiddenOne.DuplicateGroupCount == 1, hiddenOne.DuplicateGroupCount.ToString());
+Check("tür sayımı gizleneni hariç tutar", hiddenOne.TypeCounts["pdf"] == 4, hiddenOne.TypeCounts["pdf"].ToString());
+var hiddenMost = index.Search(new SearchRequest { HiddenIds = new HashSet<int> { 2, 4 } });
+Check("tüm çiftler gizlenince grup kalmaz", hiddenMost.DuplicateGroupCount == 0, hiddenMost.DuplicateGroupCount.ToString());
+Check("boş gizleme listesi eski haline getirir",
+    index.Search(new SearchRequest { HiddenIds = new HashSet<int>() }).DuplicateGroupCount == 2);
+
 Console.WriteLine("Silme panosu");
 var board = new DeleteBoard();
 board.Stage(index.GetByKey(a.DuplicateKey), keepFirstIfNew: true);

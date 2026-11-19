@@ -11,6 +11,8 @@ public sealed class SearchRequest
     public string Sort { get; init; } = "waste";
     public bool OnlyDuplicates { get; init; } = true;
     public bool GroupMode { get; init; } = true;
+    /// <summary>Silme panosunda bekleyen dosyaların arama sonuçlarından çıkarılması.</summary>
+    public IReadOnlySet<int>? HiddenIds { get; init; }
     public int MaxGroups { get; init; } = 400;
     public int MaxFiles { get; init; } = 800;
 }
@@ -197,6 +199,7 @@ public sealed class FileIndex
             if ((i & 0x3FF) == 0) token.ThrowIfCancellationRequested();
             var f = items[i];
             if (_removed.ContainsKey(f.Id)) continue;
+            if (request.HiddenIds?.Contains(f.Id) == true) continue;
 
             if (tokens.Length > 0)
             {

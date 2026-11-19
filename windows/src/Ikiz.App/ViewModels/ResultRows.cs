@@ -41,6 +41,8 @@ public sealed class FileRowVm : ResultRowVm
     public required int CopyCount { get; init; }
     public required bool IsDuplicate { get; init; }
 
+    public bool IsPicked { get; set; }
+
     public string Name => File.Name;
     public string Path => File.Directory;
     public string SizeText => File.SizeText;

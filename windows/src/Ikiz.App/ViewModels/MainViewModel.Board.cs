@@ -137,6 +137,7 @@ public sealed partial class MainViewModel
         ResetApproval();
         RefreshBoard();
         RefreshBoardTotals();
+        RefreshResultsAfterBoardChange();
         Toast($"{_board.Count} dosya panoda · Panoyu göster ile inceleyebilirsin");
     }
 
@@ -152,6 +153,7 @@ public sealed partial class MainViewModel
         ResetApproval();
         RefreshBoard();
         RefreshBoardTotals();
+        RefreshResultsAfterBoardChange();
         Toast($"{_board.Count} dosya panoda · Panoyu göster ile inceleyebilirsin");
     }
 
@@ -177,6 +179,9 @@ public sealed partial class MainViewModel
         ResetApproval();
         RefreshBoard();
         RefreshBoardTotals();
+        var hadPicks = _picked.Count > 0;
+        ClearPicks();
+        if (!hadPicks) RefreshResultsAfterBoardChange();
     }
 
     public void KeepOne(BoardGroupVm group)
@@ -187,6 +192,7 @@ public sealed partial class MainViewModel
         ResetApproval();
         RefreshBoard();
         RefreshBoardTotals();
+        RefreshResultsAfterBoardChange();
     }
 
     public void Unstage(int id)
@@ -195,6 +201,12 @@ public sealed partial class MainViewModel
         ResetApproval();
         RefreshBoard();
         RefreshBoardTotals();
+        RefreshResultsAfterBoardChange();
+    }
+
+    private void RefreshResultsAfterBoardChange()
+    {
+        if (HideStaged) TriggerSearch(immediate: true);
     }
 
     public void ResetApproval()

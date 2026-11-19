@@ -46,6 +46,7 @@ public sealed partial class MainViewModel
         ResetApproval();
         RefreshBoard();
         RefreshBoardTotals();
+        RefreshResultsAfterBoardChange();
         Toast($"{_board.Count} dosya panoda · Panoyu göster ile inceleyebilirsin");
     }
 
@@ -85,6 +86,7 @@ public sealed partial class MainViewModel
     private List<FileItem> _renameGroup = new();
     private List<FileItem> _renameType = new();
     private List<FileItem> _renameAll = new();
+    private List<FileItem> _renamePicked = new();
 
     public ObservableCollection<RenamePreviewVm> RenamePreviewRows { get; } = new();
 
@@ -145,10 +147,12 @@ public sealed partial class MainViewModel
         ? "Bu türdekiler"
         : $"{_renameFile.ExtLabel} türündeki tüm dosyalar ({_renameType.Count})";
     public string RenameAllLabel => $"Tüm sonuçlar ({_renameAll.Count})";
+    public string RenamePickedLabel => $"Seçilenler ({_renamePicked.Count})";
 
     public bool RenameCanGroup => _renameGroup.Count > 1;
     public bool RenameCanType => _renameType.Count > 1;
     public bool RenameCanAll => _renameAll.Count > 1;
+    public bool RenameCanPicked => _renamePicked.Count > 1;
 
     private bool KeepRenameExtension => _renameScopeKey != "one";
 
@@ -176,11 +180,18 @@ public sealed partial class MainViewModel
         set { if (value) SetRenameScope("all"); }
     }
 
+    public bool RenameScopePicked
+    {
+        get => _renameScopeKey == "picked";
+        set { if (value) SetRenameScope("picked"); }
+    }
+
     private List<FileItem> RenameTargets() => _renameScopeKey switch
     {
         "group" => _renameGroup,
         "type" => _renameType,
         "all" => _renameAll,
+        "picked" => _renamePicked,
         _ => _renameOne,
     };
 
@@ -201,6 +212,7 @@ public sealed partial class MainViewModel
         if (scope == "group" && !RenameCanGroup) scope = "one";
         if (scope == "type" && !RenameCanType) scope = "one";
         if (scope == "all" && !RenameCanAll) scope = "one";
+        if (scope == "picked" && !RenameCanPicked) scope = "one";
 
         _renameScopeKey = scope;
         _renameApproved = false;
@@ -212,6 +224,17 @@ public sealed partial class MainViewModel
                 : "";
 
         RenameOpen = true;
+        RaiseScopeProps();
+        RecomputeRename();
+    }
+
+    public void OpenPickedRename(IReadOnlyList<FileItem> files)
+    {
+        if (files.Count == 0) return;
+        var first = files[0];
+        _renamePicked = files.ToList();
+        OpenRename(first, "picked");
+        _renamePicked = files.ToList();
         RaiseScopeProps();
         RecomputeRename();
     }
@@ -234,6 +257,7 @@ public sealed partial class MainViewModel
         if (key == "group" && !RenameCanGroup) return;
         if (key == "type" && !RenameCanType) return;
         if (key == "all" && !RenameCanAll) return;
+        if (key == "picked" && !RenameCanPicked) return;
 
         _renameScopeKey = key;
         _renameApproved = false;
@@ -253,12 +277,15 @@ public sealed partial class MainViewModel
         Raise(nameof(RenameScopeGroup));
         Raise(nameof(RenameScopeType));
         Raise(nameof(RenameScopeAll));
+        Raise(nameof(RenameScopePicked));
         Raise(nameof(RenameGroupLabel));
         Raise(nameof(RenameTypeLabel));
         Raise(nameof(RenameAllLabel));
+        Raise(nameof(RenamePickedLabel));
         Raise(nameof(RenameCanGroup));
         Raise(nameof(RenameCanType));
         Raise(nameof(RenameCanAll));
+        Raise(nameof(RenameCanPicked));
         Raise(nameof(RenameInputLabel));
         Raise(nameof(RenameExtensionHint));
         Raise(nameof(RenameSub));
@@ -347,6 +374,7 @@ public sealed partial class MainViewModel
             RefreshBoard();
             RefreshBoardTotals();
             IndexStatus = $"İndeks hazır · {HumanSize.Number(_index.AliveCount)} dosya";
+            DropPicks();
             TriggerSearch(immediate: true);
         }
 
@@ -363,6 +391,7 @@ public sealed partial class MainViewModel
     private FileItem? _quickFile;
     private List<FileItem> _quickOne = new();
     private List<FileItem> _quickGroup = new();
+    private List<FileItem> _quickPicked = new();
     private DeleteMode _quickMode = DeleteMode.RecycleBin;
     private string _quickScopeKey = "one";
     private bool _quickApproved;
@@ -379,7 +408,9 @@ public sealed partial class MainViewModel
     public string QuickDeleteOneLabel => "Yalnızca bu dosya";
     public string QuickDeleteOthersLabel => $"Diğer kopyalar ({Math.Max(0, _quickGroup.Count - 1)}) · bu dosya kalsın";
     public string QuickDeleteCopiesLabel => $"Tüm kopyalar ({_quickGroup.Count}) · diskte hiç kalmaz";
+    public string QuickDeletePickedLabel => $"Seçilenler ({_quickPicked.Count})";
     public bool QuickDeleteCanCopies => _quickGroup.Count > 1;
+    public bool QuickDeleteCanPicked => _quickPicked.Count > 0;
 
     public bool QuickDeleteScopeOne
     {
@@ -397,6 +428,12 @@ public sealed partial class MainViewModel
     {
         get => _quickScopeKey == "all";
         set { if (value) SetQuickDeleteScope("all"); }
+    }
+
+    public bool QuickDeleteScopePicked
+    {
+        get => _quickScopeKey == "picked";
+        set { if (value) SetQuickDeleteScope("picked"); }
     }
 
     public bool QuickDeleteRecycle
@@ -428,6 +465,7 @@ public sealed partial class MainViewModel
     {
         "others" => "Kopyaları sil",
         "all" => "Her kopyayı sil",
+        "picked" => "Seçilenleri sil",
         _ => "Dosyayı sil",
     };
 
@@ -458,8 +496,18 @@ public sealed partial class MainViewModel
             .Where(f => _quickFile is null || f.Id != _quickFile.Id)
             .ToList(),
         "all" => _quickGroup,
+        "picked" => _quickPicked,
         _ => _quickOne,
     };
+
+    public void OpenPickedQuickDelete(IReadOnlyList<FileItem> files)
+    {
+        if (files.Count == 0) return;
+        _quickPicked = files.ToList();
+        OpenQuickDelete(files[0], "picked");
+        _quickPicked = files.ToList();
+        RaiseQuickDeleteProps();
+    }
 
     public void OpenQuickDelete(FileItem file, string scope = "one")
     {
@@ -492,6 +540,7 @@ public sealed partial class MainViewModel
     {
         if (_quickScopeKey == key) return;
         if ((key == "others" || key == "all") && !QuickDeleteCanCopies) return;
+        if (key == "picked" && !QuickDeleteCanPicked) return;
         _quickScopeKey = key;
         _quickApproved = false;
         RaiseQuickDeleteProps();
@@ -510,6 +559,9 @@ public sealed partial class MainViewModel
         Raise(nameof(QuickDeleteScopeOne));
         Raise(nameof(QuickDeleteScopeOthers));
         Raise(nameof(QuickDeleteScopeCopies));
+        Raise(nameof(QuickDeleteScopePicked));
+        Raise(nameof(QuickDeleteCanPicked));
+        Raise(nameof(QuickDeletePickedLabel));
         Raise(nameof(QuickDeleteRecycle));
         Raise(nameof(QuickDeletePermanent));
         Raise(nameof(QuickDeleteApproved));
@@ -574,6 +626,7 @@ public sealed partial class MainViewModel
         ResetApproval();
         RefreshBoard();
         RefreshBoardTotals();
+        DropPicks();
         TriggerSearch(immediate: true);
 
         var action = mode == DeleteMode.Permanent ? "kalıcı olarak silindi" : "geri dönüşüm kutusuna taşındı";

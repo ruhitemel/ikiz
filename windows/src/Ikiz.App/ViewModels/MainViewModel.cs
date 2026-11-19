@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Windows.Threading;
+using Ikiz.App.Services;
 using Ikiz.Core;
 
 namespace Ikiz.App.ViewModels;
@@ -178,6 +179,22 @@ public sealed partial class MainViewModel : BindableBase
         private set => Set(ref _isScanning, value);
     }
 
+    private bool _hideStaged = UiSettings.HideStaged;
+    public bool HideStaged
+    {
+        get => _hideStaged;
+        set
+        {
+            if (!Set(ref _hideStaged, value)) return;
+            UiSettings.HideStaged = value;
+            TriggerSearch(immediate: true);
+        }
+    }
+
+    private HashSet<int> HiddenIds() => HideStaged
+        ? _board.Items.Select(f => f.Id).ToHashSet()
+        : new HashSet<int>();
+
     private string _indexStatus = "İndeks hazır değil";
     public string IndexStatus
     {
@@ -328,6 +345,7 @@ public sealed partial class MainViewModel : BindableBase
         Sort = SortKey,
         OnlyDuplicates = OnlyDuplicates,
         GroupMode = GroupMode,
+        HiddenIds = HiddenIds(),
     };
 
     private async Task SearchAsync(SearchRequest request, CancellationTokenSource cts, bool immediate)
@@ -376,6 +394,7 @@ public sealed partial class MainViewModel : BindableBase
                         CopyIndex = index,
                         CopyCount = g.Count,
                         IsDuplicate = true,
+                        IsPicked = _picked.Contains(f.Id),
                     });
                 }
             }
@@ -395,6 +414,7 @@ public sealed partial class MainViewModel : BindableBase
                     CopyIndex = copy,
                     CopyCount = count,
                     IsDuplicate = count > 1,
+                    IsPicked = _picked.Contains(f.Id),
                 });
             }
         }
@@ -415,7 +435,12 @@ public sealed partial class MainViewModel : BindableBase
 
         if (IsEmpty)
         {
-            if (_index.AliveCount == 0)
+            if (HideStaged && _board.Count > 0 && result.MatchedCount == 0)
+            {
+                EmptyTitle = "Görünen dosya kalmadı";
+                EmptyHint = "Tüm sonuçlar panoda. Panoyu göster ile işlemini tamamla veya filtredeki 'Panodakileri gizle'yi kapat.";
+            }
+            else if (_index.AliveCount == 0)
             {
                 EmptyTitle = "Henüz indeks yok";
                 EmptyHint = "Bir klasör ekleyip indeksi oluştur. Hiçbir dosya izinsiz taranmaz.";
@@ -512,6 +537,7 @@ public sealed partial class MainViewModel : BindableBase
                     CopyIndex = index,
                     CopyCount = g.Count,
                     IsDuplicate = true,
+                    IsPicked = _picked.Contains(f.Id),
                 });
             }
         }

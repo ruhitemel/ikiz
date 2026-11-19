@@ -170,6 +170,24 @@ public partial class MainWindow : Window
 
     private void OnStageAllClick(object sender, RoutedEventArgs e) => _vm.StageAll();
 
+    private void OnPickCheckClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is CheckBox { Tag: FileRowVm row } box)
+            _vm.SetPicked(row.File.Id, box.IsChecked == true);
+    }
+
+    private void OnPickAllClick(object sender, RoutedEventArgs e) => _vm.PickAll();
+
+    private void OnPickCopiesClick(object sender, RoutedEventArgs e) => _vm.PickCopies();
+
+    private void OnClearPicksClick(object sender, RoutedEventArgs e) => _vm.ClearPicks();
+
+    private void OnStagePickedClick(object sender, RoutedEventArgs e) => _vm.StagePicked();
+
+    private void OnDeletePickedClick(object sender, RoutedEventArgs e) => _vm.DeletePicked();
+
+    private void OnRenamePickedClick(object sender, RoutedEventArgs e) => _vm.RenamePicked();
+
     private void OnOpenBoardClick(object sender, RoutedEventArgs e) => _vm.OpenBoard();
 
     private void OnCloseBoardClick(object sender, RoutedEventArgs e) => _vm.CloseBoard();

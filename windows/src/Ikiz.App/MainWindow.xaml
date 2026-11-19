@@ -213,12 +213,18 @@
                 </Border.ContextMenu>
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="54"/>
+                        <ColumnDefinition Width="44"/>
                         <ColumnDefinition Width="26"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
+
+                    <CheckBox Grid.Column="0" Style="{StaticResource DarkCheck}" HorizontalAlignment="Center"
+                              VerticalAlignment="Center" IsChecked="{Binding IsPicked, Mode=TwoWay}"
+                              Tag="{Binding}" Click="OnPickCheckClick"
+                              AutomationProperties.Name="Dosyayı seç"
+                              ToolTip="Toplu işlem için bu dosyayı seç"/>
 
                     <Grid Grid.Column="1" VerticalAlignment="Center">
                         <Border Width="22" Height="22" CornerRadius="6" Background="{Binding Color}" Opacity="0.12"/>
@@ -627,7 +633,10 @@
                 <CheckBox Style="{StaticResource Switch}" Content="Yalnızca çiftler" IsChecked="{Binding OnlyDuplicates, Mode=TwoWay}"
                           Margin="0,0,14,0" VerticalAlignment="Center"/>
                 <CheckBox Style="{StaticResource Switch}" Content="Yol da arama" IsChecked="{Binding SearchPath, Mode=TwoWay}"
-                          VerticalAlignment="Center" ToolTip="Kapalıyken yalnızca dosya adında arar"/>
+                          Margin="0,0,14,0" VerticalAlignment="Center" ToolTip="Kapalıyken yalnızca dosya adında arar"/>
+                <CheckBox Style="{StaticResource Switch}" Content="Panodakileri gizle" IsChecked="{Binding HideStaged, Mode=TwoWay}"
+                          VerticalAlignment="Center" AutomationProperties.Name="Panodakileri gizle"
+                          ToolTip="Panoya alınan dosyalar sonuçlardan çıkar; panodan çıkarınca geri gelir"/>
             </StackPanel>
         </Grid>
 
@@ -647,26 +656,75 @@
                     </Grid.RowDefinitions>
 
                     <Border Padding="12,8" BorderBrush="{DynamicResource LineSoftBrush}" BorderThickness="0,0,0,1">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <Border Width="3" Height="14" CornerRadius="2" Background="{DynamicResource AccentBrush}"
-                                    VerticalAlignment="Center" Margin="0,0,8,0"/>
-                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock Text="{Binding SectionTitle}" FontSize="12.5" FontWeight="SemiBold"/>
-                                <TextBlock Text="{Binding SectionMeta}" FontSize="11.5" Foreground="{DynamicResource Muted2Brush}"
-                                           Margin="10,0,0,0" VerticalAlignment="Center"/>
-                            </StackPanel>
-                            <Button Grid.Column="2" Style="{StaticResource LinkButton}" Click="OnStageAllClick"
-                                    Foreground="{DynamicResource AccentStrongBrush}" FontSize="11.5"
-                                    Visibility="{Binding CanStageAll, Converter={StaticResource BoolVis}}"
-                                    ToolTip="Görünen tüm çift gruplarını silme panosuna al">
-                                <TextBlock Text="Tümünü panoya al"/>
-                            </Button>
-                        </Grid>
+                        <StackPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Width="3" Height="14" CornerRadius="2" Background="{DynamicResource AccentBrush}"
+                                        VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding SectionTitle}" FontSize="12.5" FontWeight="SemiBold"/>
+                                    <TextBlock Text="{Binding SectionMeta}" FontSize="11.5" Foreground="{DynamicResource Muted2Brush}"
+                                               Margin="10,0,0,0" VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <Button Grid.Column="2" Style="{StaticResource LinkButton}" Click="OnStageAllClick"
+                                        Foreground="{DynamicResource AccentStrongBrush}" FontSize="11.5"
+                                        Visibility="{Binding CanStageAll, Converter={StaticResource BoolVis}}"
+                                        ToolTip="Görünen tüm çift gruplarını silme panosuna al">
+                                    <TextBlock Text="Tümünü panoya al"/>
+                                </Button>
+                            </Grid>
+
+                            <!-- Ana ekran çoklu seçimi -->
+                            <Grid Margin="11,8,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Button Style="{StaticResource LinkButton}" Click="OnPickAllClick" FontSize="11.5"
+                                            AutomationProperties.Name="Tümünü seç" ToolTip="Görünen tüm dosyaları seç">
+                                        <TextBlock Text="Tümünü seç" Foreground="{DynamicResource AccentBrush}"/>
+                                    </Button>
+                                    <TextBlock Text="·" Foreground="{DynamicResource Muted2Brush}" Margin="6,0" VerticalAlignment="Center"/>
+                                    <Button Style="{StaticResource LinkButton}" Click="OnPickCopiesClick" FontSize="11.5"
+                                            AutomationProperties.Name="Kopyaları seç" ToolTip="Her gruptan bir kopya korunur, fazlalıklar seçilir">
+                                        <TextBlock Text="Kopyaları seç" Foreground="{DynamicResource AccentBrush}"/>
+                                    </Button>
+                                    <StackPanel Orientation="Horizontal" Visibility="{Binding HasPicked, Converter={StaticResource BoolVis}}">
+                                        <TextBlock Text="·" Foreground="{DynamicResource Muted2Brush}" Margin="6,0" VerticalAlignment="Center"/>
+                                        <Button Style="{StaticResource LinkButton}" Click="OnClearPicksClick" FontSize="11.5"
+                                                AutomationProperties.Name="Seçimi temizle">
+                                            <TextBlock Text="Seçimi temizle"/>
+                                        </Button>
+                                    </StackPanel>
+                                </StackPanel>
+                                <TextBlock Grid.Column="1" Text="{Binding PickedText}" FontSize="11.5"
+                                           Foreground="{DynamicResource Muted2Brush}" VerticalAlignment="Center" Margin="12,0,0,0"/>
+                                <StackPanel Grid.Column="2" Orientation="Horizontal"
+                                            Visibility="{Binding HasPicked, Converter={StaticResource BoolVis}}">
+                                    <Button Style="{StaticResource GhostButton}" Click="OnStagePickedClick" Height="28" Padding="9,0"
+                                            IsEnabled="{Binding HasPicked}" Margin="0,0,6,0"
+                                            AutomationProperties.Name="Seçilenleri panoya al" ToolTip="Seçili dosyaları silme panosuna aktar">
+                                        <TextBlock Text="Panoya al" FontSize="11.5"/>
+                                    </Button>
+                                    <Button Style="{StaticResource DangerGhostButton}" Click="OnDeletePickedClick" Height="28" Padding="9,0"
+                                            IsEnabled="{Binding HasPicked}" Margin="0,0,6,0"
+                                            AutomationProperties.Name="Seçilenleri sil" ToolTip="Seçili dosyalar için silme onayı aç">
+                                        <TextBlock Text="Sil" FontSize="11.5"/>
+                                    </Button>
+                                    <Button Style="{StaticResource GhostButton}" Click="OnRenamePickedClick" Height="28" Padding="9,0"
+                                            IsEnabled="{Binding HasPicked}"
+                                            AutomationProperties.Name="Seçilenleri adlandır" ToolTip="Seçili dosyaları toplu yeniden adlandır">
+                                        <TextBlock Text="Adlandır" FontSize="11.5"/>
+                                    </Button>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
                     </Border>
 
                     <Grid Grid.Row="1">
@@ -1006,6 +1064,11 @@
                                                  Content="Yalnızca bu dosya"
                                                  IsChecked="{Binding RenameScopeOne, Mode=TwoWay}"/>
                                     <RadioButton Style="{StaticResource DarkRadio}" GroupName="renamescope"
+                                                 Content="{Binding RenamePickedLabel}"
+                                                 IsChecked="{Binding RenameScopePicked, Mode=TwoWay}"
+                                                 IsEnabled="{Binding RenameCanPicked}" Margin="0,9,0,0"
+                                                 Visibility="{Binding RenameCanPicked, Converter={StaticResource BoolVis}}"/>
+                                    <RadioButton Style="{StaticResource DarkRadio}" GroupName="renamescope"
                                                  Content="{Binding RenameGroupLabel}"
                                                  IsChecked="{Binding RenameScopeGroup, Mode=TwoWay}"
                                                  IsEnabled="{Binding RenameCanGroup}" Margin="0,9,0,0"/>
@@ -1179,6 +1242,11 @@
                                     <RadioButton Style="{StaticResource DarkRadio}" GroupName="quickscope"
                                                  Content="{Binding QuickDeleteOneLabel}"
                                                  IsChecked="{Binding QuickDeleteScopeOne, Mode=TwoWay}"/>
+                                    <RadioButton Style="{StaticResource DarkRadio}" GroupName="quickscope"
+                                                 Content="{Binding QuickDeletePickedLabel}"
+                                                 IsChecked="{Binding QuickDeleteScopePicked, Mode=TwoWay}"
+                                                 IsEnabled="{Binding QuickDeleteCanPicked}" Margin="0,9,0,0"
+                                                 Visibility="{Binding QuickDeleteCanPicked, Converter={StaticResource BoolVis}}"/>
                                     <RadioButton Style="{StaticResource DarkRadio}" GroupName="quickscope"
                                                  Content="{Binding QuickDeleteOthersLabel}"
                                                  IsChecked="{Binding QuickDeleteScopeOthers, Mode=TwoWay}"

@@ -10,6 +10,8 @@ Windows için hızlı dosya arama ve çift kopya temizleme aracı. Everything be
 - **Yalnızca belge ve medya** — görsel, ses, video ve belge dosyaları indekslenir; sistem, gizli, çalıştırılabilir ve uygulama dosyaları listeye girmez.
 - **Sürücü veya klasör seçimi** — `C:\`, `D:\` gibi tüm diskler birim adı ve boş alanıyla listelenir; birden fazla sürücü seçilip tek seferde taranabilir.
 - **Güvenli temizleme** — önizleme listesi, tek tek seçim, onay kutusu; varsayılan hedef **Geri Dönüşüm Kutusu**.
+- **Panodakileri gizle** — panoya alınan dosyalar listeden çıkar, sayaçlar ve çift grupları yeniden hesaplanır; istersen filtre çubuğundan kapatabilirsin.
+- **Hızlı çoklu seçim** — satır kutuları, **Tümünü seç** / **Kopyaları seç**; seçimi tek seferde panoya alma, silme veya toplu adlandırma.
 - **Esnek silme** — yalnızca bu dosya, diğer kopyalar (seçili dosya kalır) veya tüm kopyalar (diskte hiç kalmaz).
 - **Sağ tık menüsü** — panoya ekle/çıkar, adı düzenle, toplu yeniden adlandırma, silme ve son silmeyi geri alma.
 - **Açık/koyu tema** — Windows tercihiyle başlar, seçim kalıcıdır.
