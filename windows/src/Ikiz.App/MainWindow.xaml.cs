@@ -66,6 +66,13 @@ public partial class MainWindow : Window
 
         if (e.Key == Key.Escape)
         {
+            if (_vm.LocationsOpen)
+            {
+                _vm.CloseLocations();
+                e.Handled = true;
+                return;
+            }
+
             if (_vm.AboutOpen)
             {
                 _vm.CloseAbout();
@@ -99,7 +106,7 @@ public partial class MainWindow : Window
             return;
 
         var inTextBox = Keyboard.FocusedElement is TextBox;
-        if (!inTextBox && !_vm.RenameOpen && !_vm.DeleteOpen && !_vm.BoardOpen && !_vm.AboutOpen && _hoverFile is not null)
+        if (!inTextBox && !_vm.RenameOpen && !_vm.DeleteOpen && !_vm.BoardOpen && !_vm.AboutOpen && !_vm.LocationsOpen && _hoverFile is not null)
         {
             if (e.Key == Key.F2)
             {
@@ -189,7 +196,23 @@ public partial class MainWindow : Window
 
     private void OnReindexClick(object sender, RoutedEventArgs e) => _vm.Reindex();
 
-    private async void OnAddFolderClick(object sender, RoutedEventArgs e)
+    private void OnOpenLocationsClick(object sender, RoutedEventArgs e) => _vm.OpenLocations();
+
+    private void OnCloseLocationsClick(object sender, RoutedEventArgs e) => _vm.CloseLocations();
+
+    private void OnLocationsScrimClick(object sender, MouseButtonEventArgs e) => _vm.CloseLocations();
+
+    private void OnRefreshDrivesClick(object sender, RoutedEventArgs e) => _vm.RefreshDrives();
+
+    private async void OnAddSelectedDrivesClick(object sender, RoutedEventArgs e)
+        => await _vm.AddSelectedDrivesAsync();
+
+    private void OnRemoveRootClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button { Tag: string path }) _vm.RemoveRoot(path);
+    }
+
+    private async void OnPickFolderClick(object sender, RoutedEventArgs e)
     {
         var dialog = new OpenFolderDialog
         {
@@ -198,7 +221,7 @@ public partial class MainWindow : Window
         };
 
         if (dialog.ShowDialog(this) == true)
-            await _vm.AddRootAsync(dialog.FolderName);
+            await _vm.AddLocationsAsync(new[] { dialog.FolderName });
     }
 
     // ------------------------------------------------------------ sağ tık menüsü

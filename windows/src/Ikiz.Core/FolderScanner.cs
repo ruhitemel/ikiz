@@ -19,6 +19,7 @@ public static class FolderScanner
         "windows",
         "windows.old",
         "recovery",
+        "documents and settings",
         "appdata",
         "program files",
         "program files (x86)",

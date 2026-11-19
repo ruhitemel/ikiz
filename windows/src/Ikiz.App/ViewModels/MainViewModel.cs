@@ -191,7 +191,7 @@ public sealed partial class MainViewModel : BindableBase
         private set => Set(ref _scanText, value);
     }
 
-    private string _rootsText = "0 klasör";
+    private string _rootsText = "Konum yok";
     public string RootsText
     {
         get => _rootsText;
@@ -234,19 +234,6 @@ public sealed partial class MainViewModel : BindableBase
         await ScanAsync();
     }
 
-    public async Task AddRootAsync(string path)
-    {
-        if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path)) return;
-        var full = Path.GetFullPath(path).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-        if (!_roots.Any(r => IsUnder(full, r)))
-        {
-            _roots.RemoveAll(r => IsUnder(r, full));
-            _roots.Add(full);
-        }
-
-        await ScanAsync();
-    }
-
     public void Reindex() => _ = ScanAsync();
 
     public void Stop()
@@ -272,7 +259,7 @@ public sealed partial class MainViewModel : BindableBase
         EmptyHint = "İlk indeks oluşturuluyor, bu birkaç saniye sürebilir.";
         ResultSummary = "Taranıyor…";
         ElapsedText = "";
-        RootsText = $"{_roots.Count} klasör";
+        RefreshRoots();
 
         var progress = new Progress<ScanProgress>(p =>
         {
