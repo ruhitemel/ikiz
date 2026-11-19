@@ -2,6 +2,21 @@
 
 Bu dosya [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) biçimini izler. Sürüm numaraları [Semantic Versioning](https://semver.org/lang/tr/) kullanır.
 
+## [1.2.1] - 2026-11-19
+
+### Değiştirildi
+
+- **Kurulum sihirbazı** — artık `.msi` paketi de yayınlanıyor; alışılmış **İleri → İleri → Kurulum → Bitti** akışıyla kurulur. Hızlı tek tık kurulum için `ikiz-win-Setup.exe` korundu.
+- **Sürüm notları** — GitHub Releases gövdesi yalnızca ilgili sürümün notlarını içerir; tüm değişiklik günlüğü artık eklenmez.
+- **Kullanım rehberi** — kurulum paketindeki rehber ve Windows README'sindeki **Kullanım rehberi** sade bir dille yeniden yazıldı.
+
+### Güvenlik
+
+- Yayın paketinde hata ayıklama simgeleri (`.pdb`) ve yerel derleme yolları bulunmaz; paket yalnızca uygulama dosyalarını içerir. Yayın iş akışı kişisel yol sızıntısını denetler.
+- Geliştirici bilgisi uygulamada yalnızca **Hakkında** bölümünde gösterilir.
+
+[1.2.1]: https://github.com/ruhitemel/ikiz/releases/tag/v1.2.1
+
 ## [1.2.0] - 2026-11-19
 
 ### Eklendi

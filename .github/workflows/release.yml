@@ -35,6 +35,18 @@ jobs:
           $version = $env:VERSION.TrimStart('v')
           "VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
+      - name: Sürüm notlarını ve kurulum metinlerini hazırla
+        shell: pwsh
+        run: |
+          $raw = Get-Content -Raw CHANGELOG.md
+          $pattern = '(?ms)^## \[' + [regex]::Escape($env:VERSION) + '\].*?(?=^## \[|\z)'
+          $match = [regex]::Match($raw, $pattern)
+          if (-not $match.Success) { throw "$env:VERSION için sürüm notu bulunamadı." }
+          $notes = $match.Value -replace '(?m)^\[.*\]:\s*\S+\s*$', ''
+          [IO.File]::WriteAllText((Join-Path $pwd 'RELEASE_NOTES.md'), $notes.Trim(), (New-Object Text.UTF8Encoding($false)))
+          Copy-Item LICENSE (Join-Path $pwd 'lisans.txt')
+          Get-Content RELEASE_NOTES.md
+
       - name: Derle ve test et
         shell: pwsh
         run: |
@@ -52,6 +64,15 @@ jobs:
             -c Release -r win-x64 --self-contained true `
             -p:Version=$env:VERSION -o publish
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Get-ChildItem publish -Recurse -Filter *.pdb -File | Remove-Item -Force
+          $personal = Get-ChildItem publish -Recurse -File | Where-Object {
+            $text = [Text.Encoding]::ASCII.GetString([IO.File]::ReadAllBytes($_.FullName))
+            $text -match 'userntw|Default Project|C:\\Users\\'
+          }
+          if ($personal) {
+            $personal | ForEach-Object { Write-Error ("Yerel yol içeren dosya: " + $_.Name) }
+            exit 1
+          }
 
       - name: Velopack paketini oluştur
         shell: pwsh
@@ -64,7 +85,12 @@ jobs:
             --packDir publish `
             --mainExe Ikiz.App.exe `
             --icon windows/src/Ikiz.App/Assets/ikiz.ico `
-            --releaseNotes CHANGELOG.md `
+            --releaseNotes RELEASE_NOTES.md `
+            --msi --instLocation Either `
+            --instWelcome windows/installer/kurulum-mesaji.md `
+            --instReadme windows/installer/kullanim-rehberi.md `
+            --instLicense lisans.txt `
+            --instConclusion windows/installer/kurulum-tamam.md `
             --outputDir Releases `
             --channel win
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

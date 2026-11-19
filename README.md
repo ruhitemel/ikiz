@@ -44,7 +44,12 @@ dotnet run --project windows/tests/Ikiz.Tests/Ikiz.Tests.csproj
 
 Ayrıntılı kullanım, kısayollar ve güvenlik kuralları: [`windows/README.md`](windows/README.md).
 
-Kurulumlu sürüm (güncellemeleri almak için) ve taşınabilir sürüm indirmek için [Releases](https://github.com/ruhitemel/ikiz/releases) sayfasına bak. `Ikiz.Setup.exe` ile kurulan sürüm otomatik güncellemeyi etkinleştirir; taşınabilir sürümde güncelleme denetimi yerine sürüm sayfası açılır.
+Kurulumlu sürüm (güncellemeleri almak için) ve taşınabilir sürüm indirmek için [Releases](https://github.com/ruhitemel/ikiz/releases) sayfasına bak:
+
+- `ikiz-win-Setup.exe` — tek tıkla kurar.
+- `ikiz-win.msi` — **İleri → İleri → Kurulum → Bitti** sihirbazıyla kurar.
+
+Kurulumlu sürüm açılışta GitHub Releases üzerinden yeni sürümü denetler; **Hakkında → Güncellemeleri denetle** ile de kontrol edebilirsin. Taşınabilir sürümde otomatik güncelleme yoktur; sürüm sayfasından yeni dosyayı indir. Ayrıntılı kurulum ve sade dille kullanım rehberi: [`windows/README.md`](windows/README.md).
 
 ## Arayüz prototipi
 
