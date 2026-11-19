@@ -2,6 +2,17 @@
 
 Bu dosya [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) biçimini izler. Sürüm numaraları [Semantic Versioning](https://semver.org/lang/tr/) kullanır.
 
+## [1.2.2] - 2026-11-19
+
+### Güvenlik
+
+- **Çalışma zamanı bütünlük ve kurcalama koruması (`RuntimeGuard`)** — güncelleme deposu URL'si ve geliştirici/depo bilgileri SHA-256 özetiyle sabitlendi (hex-edit ile sahte güncelleme sunucusuna yönlendirme engellendi); DLL side-loading kontrolü ve Release derlemesinde hata ayıklayıcı / CLR profiler / `DOTNET_STARTUP_HOOKS` enjeksiyon koruması eklendi.
+- **ReadyToRun ve deterministik derleme** — yayın paketleri yerel x64 makine koduna (`PublishReadyToRun`) ve deterministik (`PathMap`) olarak derlenir.
+- **Dosya işlemi (TOCTOU) sertleştirmesi** — silme ve yeniden adlandırma anında sembolik bağlantı (`ReparsePoint`), sistem dosyası (`System`), klasör dışına kaçış ve belge/medya beyaz listesi tekrar doğrulanır.
+- **URL ve günlük güvenliği** — dış bağlantılar yalnızca `https://github.com/ruhitemel/ikiz` adresine izin verir; hata günlüğü kullanıcı adını ve profil dizinini otomatik maskeler ve 512 KB ile sınırlandırılır.
+
+[1.2.2]: https://github.com/ruhitemel/ikiz/releases/tag/v1.2.2
+
 ## [1.2.1] - 2026-11-19
 
 ### Değiştirildi

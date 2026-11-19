@@ -199,6 +199,33 @@ try
     var permanent = FileDeleter.Delete(new[] { item1, item2 }, DeleteMode.Permanent);
     Check("kalıcı silme 2 dosya", permanent.Deleted.Count == 2 && !File.Exists(p1) && !File.Exists(p2));
 
+    var exePath = Path.Combine(temp, "uygulama.exe");
+    File.WriteAllText(exePath, "ikili");
+    var exeItem = new FileItem { Id = 104, FullPath = exePath, Name = "uygulama.exe", Directory = temp, Extension = "exe", Size = 5 };
+    var blockedExe = FileDeleter.Delete(new[] { exeItem }, DeleteMode.Permanent);
+    Check("çalıştırılabilir dosya silinmez", blockedExe.Deleted.Count == 0 && blockedExe.Failed.Count == 1 && File.Exists(exePath));
+
+    var sysPath = Path.Combine(temp, "sistem.txt");
+    File.WriteAllText(sysPath, "sys");
+    File.SetAttributes(sysPath, File.GetAttributes(sysPath) | FileAttributes.System);
+    var sysItem = new FileItem { Id = 105, FullPath = sysPath, Name = "sistem.txt", Directory = temp, Extension = "txt", Size = 3 };
+    var blockedSys = FileDeleter.Delete(new[] { sysItem }, DeleteMode.Permanent);
+    File.SetAttributes(sysPath, FileAttributes.Normal);
+    Check("sistem öznitelikli dosya silinmez", blockedSys.Deleted.Count == 0 && blockedSys.Failed.Count == 1 && File.Exists(sysPath));
+
+    var escapeSource = Path.Combine(temp, "normal.txt");
+    File.WriteAllText(escapeSource, "ok");
+    var escapeItem = new FileItem { Id = 106, FullPath = escapeSource, Name = "normal.txt", Directory = temp, Extension = "txt", Size = 2 };
+    var forgedPlan = new[]
+    {
+        new RenamePlanItem(escapeItem, Path.Combine(Path.GetDirectoryName(temp)!, "kacis.txt")),
+        new RenamePlanItem(escapeItem, Path.Combine(temp, "zararli.exe")),
+    };
+    var forgedOutcome = FileRenamer.Apply(forgedPlan);
+    Check("klasör dışına veya yasak uzantıya adlandırma engellenir",
+        forgedOutcome.SuccessCount == 0 && forgedOutcome.FailedCount == 2 && File.Exists(escapeSource));
+    Check("kontrol karakterli ad reddedilir", FileRenamer.ValidateBaseName("rapor\u0007") is not null);
+
     if (OperatingSystem.IsWindows())
     {
         var recycle = FileDeleter.Delete(new[] { item3 }, DeleteMode.RecycleBin);

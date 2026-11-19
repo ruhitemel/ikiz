@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Windows;
+using Ikiz.App.Services;
 using Velopack;
 
 namespace Ikiz.App;
@@ -11,6 +12,8 @@ public partial class App : Application
     [STAThread]
     public static void Main(string[] args)
     {
+        RuntimeGuard.Enforce();
+
         // Velopack kurulum/güncelleme kancalarını WPF başlamadan önce işler.
         VelopackApp.Build().Run();
 

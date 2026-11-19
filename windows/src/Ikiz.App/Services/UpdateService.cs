@@ -21,6 +21,11 @@ public sealed class UpdateService
     {
         try
         {
+            if (!RuntimeGuard.IsTrustedRepositoryUrl(RepositoryUrl))
+            {
+                _manager = null;
+                return;
+            }
             _manager = new UpdateManager(new GithubSource(RepositoryUrl, null, false));
         }
         catch (Exception ex)

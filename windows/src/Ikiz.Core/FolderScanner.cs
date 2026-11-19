@@ -60,9 +60,9 @@ public static class FolderScanner
                             info = new FileInfo(file);
                             if (!info.Exists) continue;
 
-                            // Sistem, gizli ve çevrimdışı dosyalar listeye girmez.
+                            // Sistem, gizli, çevrimdışı ve sembolik bağlantı (reparse point) dosyaları listeye girmez.
                             var attrs = info.Attributes;
-                            if ((attrs & (FileAttributes.Hidden | FileAttributes.System | FileAttributes.Offline)) != 0)
+                            if ((attrs & (FileAttributes.Hidden | FileAttributes.System | FileAttributes.Offline | FileAttributes.ReparsePoint)) != 0)
                                 continue;
                         }
                         catch

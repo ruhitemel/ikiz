@@ -66,8 +66,12 @@ public static class FileDeleter
         var alive = new List<FileItem>();
         foreach (var item in items)
         {
-            if (File.Exists(item.FullPath)) alive.Add(item);
-            else failed.Add((item.FullPath, "Dosya bulunamadı"));
+            if (!IsSafeToDelete(item.FullPath, out var reason))
+            {
+                failed.Add((item.FullPath, reason));
+                continue;
+            }
+            alive.Add(item);
         }
 
         if (alive.Count == 0) return new DeleteOutcome(deleted, failed, 0);
@@ -110,9 +114,9 @@ public static class FileDeleter
 
         foreach (var item in items)
         {
-            if (!File.Exists(item.FullPath))
+            if (!IsSafeToDelete(item.FullPath, out var reason))
             {
-                failed.Add((item.FullPath, "Dosya bulunamadı"));
+                failed.Add((item.FullPath, reason));
                 continue;
             }
 
@@ -129,5 +133,58 @@ public static class FileDeleter
         }
 
         return new DeleteOutcome(deleted, failed, freed);
+    }
+
+    public static bool IsSafeToDelete(string? path, out string reason)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            reason = "Geçersiz dosya yolu";
+            return false;
+        }
+
+        try
+        {
+            var full = Path.GetFullPath(path);
+            if (!File.Exists(full))
+            {
+                reason = "Dosya bulunamadı";
+                return false;
+            }
+
+            var attrs = File.GetAttributes(full);
+            if ((attrs & FileAttributes.Directory) != 0)
+            {
+                reason = "Klasörler silinemez";
+                return false;
+            }
+
+            if ((attrs & FileAttributes.ReparsePoint) != 0)
+            {
+                reason = "Sembolik bağlantılar güvenlik nedeniyle silinmez";
+                return false;
+            }
+
+            if ((attrs & FileAttributes.System) != 0)
+            {
+                reason = "Sistem dosyaları silinmez";
+                return false;
+            }
+
+            var ext = Path.GetExtension(full).TrimStart('.');
+            if (!FileCategories.IsUserContent(ext))
+            {
+                reason = "Yalnızca belge ve medya dosyaları silinebilir";
+                return false;
+            }
+
+            reason = "";
+            return true;
+        }
+        catch (Exception ex)
+        {
+            reason = ex.Message;
+            return false;
+        }
     }
 }

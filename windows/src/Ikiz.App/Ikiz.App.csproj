@@ -10,7 +10,7 @@
     <ApplicationIcon>Assets\ikiz.ico</ApplicationIcon>
     <AssemblyName>Ikiz.App</AssemblyName>
     <RootNamespace>Ikiz.App</RootNamespace>
-    <Version>1.2.1</Version>
+    <Version>1.2.2</Version>
     <Authors>Ikiz contributors</Authors>
     <Product>İkiz</Product>
     <Description>Windows için hızlı dosya arama ve çift kopya temizleyici.</Description>
@@ -21,10 +21,14 @@
     <SatelliteResourceLanguages>tr;en</SatelliteResourceLanguages>
   </PropertyGroup>
 
-  <!-- Yayın paketinde hata ayıklama simgesi ve yerel derleme yolu bulunmasın. -->
+  <!-- Yayın paketinde hata ayıklama simgesi ve yerel derleme yolu bulunmasın; yerel makine koduna (ReadyToRun) derlensin. -->
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <DebugType>none</DebugType>
     <DebugSymbols>false</DebugSymbols>
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    <PathMap>$(MSBuildProjectDirectory)=.</PathMap>
+    <PublishReadyToRun>true</PublishReadyToRun>
   </PropertyGroup>
 
   <ItemGroup>

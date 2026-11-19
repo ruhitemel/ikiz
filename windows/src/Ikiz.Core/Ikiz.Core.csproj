@@ -6,10 +6,13 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <!-- Yayın paketinde hata ayıklama simgesi ve yerel derleme yolu bulunmasın. -->
+  <!-- Yayın paketinde hata ayıklama simgesi ve yerel derleme yolu bulunmasın; deterministik derlensin. -->
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <DebugType>none</DebugType>
     <DebugSymbols>false</DebugSymbols>
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    <PathMap>$(MSBuildProjectDirectory)=.</PathMap>
   </PropertyGroup>
 
 </Project>

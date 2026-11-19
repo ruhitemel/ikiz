@@ -95,6 +95,9 @@ public sealed partial class MainViewModel
 
     public void OpenAbout()
     {
+        if (!RuntimeGuard.IsTrustedAttribution(DeveloperCredit, RepositoryDisplay))
+            return;
+
         AboutOpen = true;
         if (_updatePhase == UpdatePhase.Idle)
             _ = CheckUpdatesAsync(manual: false);
@@ -260,7 +263,15 @@ public sealed partial class MainViewModel
     {
         try
         {
-            Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+            if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) ||
+                !string.Equals(uri.Scheme, Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase) ||
+                !string.Equals(uri.Host, "github.com", StringComparison.OrdinalIgnoreCase) ||
+                !uri.AbsolutePath.StartsWith("/ruhitemel/ikiz", StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            Process.Start(new ProcessStartInfo(uri.AbsoluteUri) { UseShellExecute = true });
         }
         catch (Exception ex)
         {

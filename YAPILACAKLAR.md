@@ -9,11 +9,12 @@ Kullanıcı geri bildirimlerinin işlenme sırası. Tamamlanan maddeler işaretl
 5. [x] **Testler, UIA doğrulaması, commit ve yayın** — 51/51 birim testi, 22 UIA kontrolü geçti; derleme 0 uyarı / 0 hata. `v1.1.0` yayınlandı; opak arka plan ve özet düzeltmesi `v1.1.1` ile yayınlandı.
 6. [x] **Pano listesini kısaltma ve hızlı çoklu seçim** — panodakiler aramadan gizleniyor (anahtarla kapatılabilir); satır seçimi, Tümünü seç / Kopyaları seç ve seçili dosyalar için pano + sil + adlandır eklendi. `v1.2.0`.
 7. [x] **Kurulum, güncelleme ve paket temizliği** — `.msi` sihirbazı eklendi; GitHub Releases gövdesi sürüm notlarıyla sınırlı; yayın paketinden PDB ve yerel yollar çıkarıldı; kullanım rehberi sadeleştirildi. `v1.2.1`.
+8. [x] **Güvenlik ve tersine mühendislik sertleştirmesi** — `RuntimeGuard` (SHA-256 URL/bütünlük sabitleme, anti-debugger/profiler/startup-hook, DLL side-loading kontrolü), ReadyToRun yerel kod derlemesi, silme/adlandırma TOCTOU + `ReparsePoint` koruması, `OpenUrl` HTTPS kısıtı ve günlük maskeleme eklendi. `v1.2.2`.
 
 ## Doğrulama özeti
 
 - Derleme: 0 uyarı, 0 hata.
-- Birim testleri: 56 geçti, 0 başarısız.
+- Birim testleri: 60 geçti, 0 başarısız.
 - UIA: pano otomatik açılmıyor, "Panoyu göster" açıyor; geliştirici adı ve açık kaynak notu görünüyor; gizlilik denetiminin 9 maddesi mevcut; Esc paneli kapatıyor; hata kaydı yok.
 - Tarama sırasında canlı detay, geçen süre ve kalan tahmin UIA ile görüldü.
 - Çoklu seçim UIA: Kopyaları seç 19 dosyayı işaretledi; panoya alınca liste 31 dosya / 12 gruptan 12 dosya / 0 gruba indi; pano temizlenince geri geldi. Silme ve adlandırma panelleri "Seçilenler (19)" kapsamıyla açıldı (25 kontrol geçti).

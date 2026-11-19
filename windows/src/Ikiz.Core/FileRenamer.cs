@@ -46,7 +46,7 @@ public static class FileRenamer
         if (value.Length == 0) return "Ad boş olamaz.";
         if (value is "." or "..") return "Geçersiz ad.";
 
-        if (value.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
+        if (value.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 || value.Any(char.IsControl))
             return "Ad şu karakterleri içeremez: \\ / : * ? \" < > |";
 
         if (value.EndsWith(' ')) return "Ad boşluk ile bitemez.";
@@ -121,6 +121,23 @@ public static class FileRenamer
                 if (!File.Exists(oldPath))
                 {
                     results.Add(new RenameResult(item.File.Id, oldPath, newPath, false, "Dosya bulunamadı"));
+                    continue;
+                }
+
+                var attrs = File.GetAttributes(oldPath);
+                if ((attrs & (FileAttributes.ReparsePoint | FileAttributes.System | FileAttributes.Directory)) != 0)
+                {
+                    results.Add(new RenameResult(item.File.Id, oldPath, newPath, false, "Güvenlik nedeniyle bu öğe yeniden adlandırılamaz"));
+                    continue;
+                }
+
+                var oldDir = Path.GetFullPath(Path.GetDirectoryName(oldPath) ?? "");
+                var newDir = Path.GetFullPath(Path.GetDirectoryName(newPath) ?? "");
+                var targetExt = Path.GetExtension(newPath).TrimStart('.');
+                if (!string.Equals(oldDir, newDir, StringComparison.OrdinalIgnoreCase) ||
+                    !FileCategories.IsUserContent(targetExt))
+                {
+                    results.Add(new RenameResult(item.File.Id, oldPath, newPath, false, "Hedef yol veya uzantı geçersiz"));
                     continue;
                 }
 
