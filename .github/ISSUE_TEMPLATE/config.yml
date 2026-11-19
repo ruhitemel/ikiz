@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Güvenlik açığı bildirimi
+    url: https://github.com/ruhitemel/ikiz/security/advisories/new
+    about: Güvenlik açıklarını herkese açık issue yerine buradan bildir.
+  - name: Katkı rehberi
+    url: https://github.com/ruhitemel/ikiz/blob/main/CONTRIBUTING.md
+    about: Katkı ve geliştirme kuralları.

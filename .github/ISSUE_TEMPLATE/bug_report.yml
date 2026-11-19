@@ -1,0 +1,50 @@
+name: 🐛 Hata bildirimi
+description: Beklenmedik bir davranış veya hata bildir
+title: "[Hata]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Teşekkürler! Lütfen kişisel bilgi (gerçek ad, e-posta, yerel yol) paylaşma.
+        Güvenlik açıkları için SECURITY.md dosyasındaki yöntemi kullan.
+  - type: input
+    id: version
+    attributes:
+      label: İkiz sürümü
+      description: Hakkında penceresindeki sürüm numarası
+      placeholder: "1.0.0"
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Windows sürümü
+      placeholder: "Windows 11 23H2"
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: Ne oldu?
+      description: Beklenen ve gerçekleşen davranışı yaz.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Yeniden oluşturma adımları
+      placeholder: |
+        1. Klasör ekle
+        2. "rapor" ara
+        3. Sağ tık → Sil…
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Hata kaydı (varsa)
+      description: "%LOCALAPPDATA%\Ikiz\ikiz-error.log dosyasının ilgili bölümü"
+      render: text
+    validations:
+      required: false

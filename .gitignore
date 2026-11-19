@@ -1,0 +1,31 @@
+# .gitignore
+
+## .NET / Visual Studio
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.cache
+*.ilk
+*.pdb
+*.tlog
+*.log
+TestResults/
+
+## Yayın / paketleme
+publish/
+Releases/
+artifacts/
+*.nupkg
+.vpk/
+
+## Platform
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+## Geçici demo verisi
+ikiz-demo/

@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Ikiz.App/Ikiz.App.csproj" />
+    <Project Path="src/Ikiz.Core/Ikiz.Core.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Ikiz.Tests/Ikiz.Tests.csproj" />
+  </Folder>
+</Solution>

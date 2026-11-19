@@ -1,0 +1,32 @@
+name: ✨ Özellik önerisi
+description: Yeni bir özellik veya iyileştirme öner
+title: "[Özellik]: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Hangi sorunu çözüyor?
+      description: Kullanırken karşılaştığın sıkıntıyı anlat.
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Önerilen çözüm
+      description: Nasıl çalışmasını istersin?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Değerlendirilen alternatifler
+    validations:
+      required: false
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Güvenlik kuralları
+      options:
+        - label: Öneri, onaysız dosya işlemi veya varsayılan olmayan kalıcı silme içermiyor.
+          required: true
