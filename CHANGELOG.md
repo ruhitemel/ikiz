@@ -2,6 +2,20 @@
 
 Bu dosya [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) biçimini izler. Sürüm numaraları [Semantic Versioning](https://semver.org/lang/tr/) kullanır.
 
+## [1.1.0] - 2026-11-19
+
+### Eklendi
+
+- **Canlı tarama ilerlemesi** — arka planda disk taranırken ilerleme çubuğu (animasyonlu), taranan dosya sayısı, geçen süre, anlık hız ve tahmini kalan süre. İlk taramada toplam bilinmediği için belirsiz animasyon ve canlı sayaç gösterilir.
+- **Paylaşım öncesi gizlilik denetimi** — **Hakkında → Paylaşım denetimi** ile e-posta, IP, kişisel yol, kullanıcı adı, günlük, gizli anahtar ve veri aktarımı maddelerini tek tek kontrol eder; kişisel bilgi içermeyen özeti panoya kopyalar.
+- **Geliştirici ve lisans vurgusu** — Hakkında bölümünde `Ruhi Temel (@ruhitemel)` ve "Açık kaynaklıdır, herkesin kullanımına açıktır." notu.
+
+### Değiştirildi
+
+- **Panoya al** artık silme panosunu otomatik açmıyor; yalnızca kısa bildirim ve sayı güncelleniyor. Panel isteğe bağlı olarak başlıktaki **Panoyu göster** düğmesiyle açılıyor.
+
+[1.1.0]: https://github.com/ruhitemel/ikiz/releases/tag/v1.1.0
+
 ## [1.0.0] - 2026-11-19
 
 ### Eklendi

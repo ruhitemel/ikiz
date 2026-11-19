@@ -36,7 +36,8 @@ public sealed partial class MainViewModel
 
     public string AppVersion => _updateService.Version;
     public string AboutVersionText => "Sürüm " + AppVersion;
-    public string DeveloperCredit => "Ruhi Temel · @ruhitemel";
+    public string DeveloperCredit => "Ruhi Temel (@ruhitemel)";
+    public string OpenSourceNote => "Açık kaynaklıdır, herkesin kullanımına açıktır.";
     public string RepositoryDisplay => "github.com/ruhitemel/ikiz";
     public string LicenseName => "MIT Açık Kaynak Lisansı";
     public string ProjectUrl => UpdateService.RepositoryUrl;

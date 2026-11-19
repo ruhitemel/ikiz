@@ -13,6 +13,8 @@ Windows için hızlı dosya arama ve çift kopya temizleme aracı. Everything be
 - **Esnek silme** — yalnızca bu dosya, diğer kopyalar (seçili dosya kalır) veya tüm kopyalar (diskte hiç kalmaz).
 - **Sağ tık menüsü** — panoya ekle/çıkar, adı düzenle, toplu yeniden adlandırma, silme ve son silmeyi geri alma.
 - **Açık/koyu tema** — Windows tercihiyle başlar, seçim kalıcıdır.
+- **Canlı tarama ilerlemesi** — animasyonlu ilerleme çubuğu, dosya sayısı, geçen süre, anlık hız ve tahmini kalan süre.
+- **Paylaşım öncesi gizlilik denetimi** — kişisel veri içermediğini madde madde doğrular; temiz özeti panoya kopyalar.
 - **Otomatik güncelleme** — kurulumlu sürümler GitHub Releases üzerinden yeni sürümü denetler, indirir ve yeniden başlatınca uygular.
 - **Erişilebilirlik** — klavye kısayolları, ekran okuyucu etiketleri ve yüksek kontrastlı iki tema.
 
@@ -64,7 +66,7 @@ ikiz/
 
 Katkılar memnuniyetle karşılanır; [CONTRIBUTING.md](CONTRIBUTING.md) ve [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) dosyalarına bak. Güvenlik açıklarını herkese açık issue yerine [SECURITY.md](SECURITY.md) içindeki yöntemle bildir.
 
-Bu proje [MIT Lisansı](LICENSE) ile açık kaynaktır. Geliştirici notu uygulamanın **Hakkında** bölümünde yer alır.
+Bu proje [MIT Lisansı](LICENSE) ile açık kaynaktır ve **herkesin kullanımına açıktır**. Geliştirici notu (`Ruhi Temel · @ruhitemel`) uygulamanın **Hakkında** bölümünde yer alır. Ekran görüntüsü veya kayıt paylaşmadan önce **Hakkında → Paylaşım denetimi** bölümünü kullanabilirsin.
 
 ## Yol haritası
 

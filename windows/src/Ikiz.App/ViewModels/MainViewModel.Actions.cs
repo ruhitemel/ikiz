@@ -46,7 +46,7 @@ public sealed partial class MainViewModel
         ResetApproval();
         RefreshBoard();
         RefreshBoardTotals();
-        BoardOpen = true;
+        Toast($"{_board.Count} dosya panoda · Panoyu göster ile inceleyebilirsin");
     }
 
     public void UnstageFile(FileItem file) => Unstage(file.Id);

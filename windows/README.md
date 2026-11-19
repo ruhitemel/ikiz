@@ -44,10 +44,10 @@ powershell -ExecutionPolicy Bypass -File demo\olustur.ps1 -Temizle
 
 ## Nasıl çalışır
 
-1. **Tarama** — açılışta Masaüstü, Belgeler, İndirilenler, Resimler, Müzik ve Videolar taranır. Başlık çubuğundaki **Konum ekle** ile sürücülerin tamamı (`C:\`, `D:\` …; birim adları ve boş alanlarıyla birlikte listelenir), bağlı ağ/çıkarılabilir diskler veya belirli bir klasör eklenir. Birden fazla sürücü işaretlenip tek seferde **Seçilenleri ekle ve tara** denilebilir. Eklenen kökler panelde listelenir ve kaldırılabilir; **Yeniden indeksle** tüm kökleri baştan tarar. Yalnızca **belge, görsel, ses ve video** dosyaları indekslenir; sistem, gizli, çalıştırılabilir ve uygulama dosyaları listeye hiç girmez. Windows, Program Files, ProgramData, AppData, `$Recycle.Bin`, `System Volume Information`, `node_modules` ve `.git` gibi klasörler atlanır.
+1. **Tarama** — açılışta Masaüstü, Belgeler, İndirilenler, Resimler, Müzik ve Videolar taranır. Başlık çubuğundaki **Konum ekle** ile sürücülerin tamamı (`C:\`, `D:\` …; birim adları ve boş alanlarıyla birlikte listelenir), bağlı ağ/çıkarılabilir diskler veya belirli bir klasör eklenir. Birden fazla sürücü işaretlenip tek seferde **Seçilenleri ekle ve tara** denilebilir. Eklenen kökler panelde listelenir ve kaldırılabilir; **Yeniden indeksle** tüm kökleri baştan tarar. Tarama arka planda sürerken animasyonlu ilerleme çubuğu, taranan dosya sayısı, **geçen süre**, anlık hız ve **tahmini kalan süre** canlı gösterilir; ilk taramada toplam bilinmediği için belirsiz animasyon kullanılır. Yalnızca **belge, görsel, ses ve video** dosyaları indekslenir; sistem, gizli, çalıştırılabilir ve uygulama dosyaları listeye hiç girmez. Windows, Program Files, ProgramData, AppData, `$Recycle.Bin`, `System Volume Information`, `node_modules` ve `.git` gibi klasörler atlanır.
 2. **Anında arama** — her tuşta sonuçlar yenilenir. Türkçe karakter katlama vardır: `İ`, `I`, `ı` → `i`; `ş` → `s`; `ğ` → `g`; `ç` → `c`; `ö` → `o`; `ü` → `u`. Birden çok kelime AND olarak aranır. Varsayılan olarak yalnızca dosya adında arar; "Yol da arama" tam yolu kapsar.
 3. **Çift gruplama** — normalleştirilmiş ad + boyut + uzantı aynıysa dosyalar tek grupta toplanır. "Kazanılabilir alan" = `boyut × (kopya sayısı − 1)`.
-4. **Silme panosu** — bir grubun "Panoya al" düğmesi veya satırdaki çöp kutusu, **o dosyanın bütün kopyalarını** panoya alır. Sağ tık → **Panoya ekle** ise yalnızca o dosyayı ekler. Pano bellekte bekler; panel kapansa bile üstteki "Silme panosu" düğmesiyle geri açılır.
+4. **Silme panosu** — bir grubun "Panoya al" düğmesi veya satırdaki çöp kutusu, **o dosyanın bütün kopyalarını** panoya alır. Sağ tık → **Panoya ekle** ise yalnızca o dosyayı ekler. Pano otomatik açılmaz; kısa bir bildirim ve sayı güncellenir. İncelemek için başlık çubuğundaki **Panoyu göster** düğmesine bas. Pano bellekte bekler; panel kapatılsa bile korunur.
 5. **Kontrol** — panoda her kopya ayrı satırdır:
    - tek tek işaretle / kaldır,
    - "Tümünü seç" / "Hiçbirini seç",
@@ -63,6 +63,8 @@ powershell -ExecutionPolicy Bypass -File demo\olustur.ps1 -Temizle
    - **Her kopyayı sil… (diskte hiç kalmaz)** — grubun tamamı silinir; kırmızı uyarı gösterilir,
    - **Son silmeyi geri al** — geri dönüşüm kutusundan özgün konuma geri yükler.
 9. **Tema** — başlık çubuğundaki **Açık / Koyu** seçiciyle anında değiştirilir. İlk açılışta Windows'un tema ayarına uyulur; seçim `%LOCALAPPDATA%\Ikiz\theme.txt` içinde saklanır.
+10. **Paylaşım denetimi** — **Hakkında → Paylaşım denetimi** ekranı; e-posta adresi, IP adresi, kişisel yol, kullanıcı adı, hata kaydı, gizli anahtar, veri aktarımı ve geliştirici notu maddelerini tek tek işaretler. Ekranda hiçbir dosya adı, kişi adı veya yerel yol gösterilmez; **Özeti kopyala** ile güvenli, kişisel bilgi içermeyen bir metin panoya alınır.
+11. **Hakkında** — geliştirici notu `Ruhi Temel (@ruhitemel)`, MIT lisansı ve "açık kaynak, herkesin kullanımına açık" vurgusu burada yer alır.
 
 ## Kısayollar
 

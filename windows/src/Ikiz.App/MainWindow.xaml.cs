@@ -66,6 +66,13 @@ public partial class MainWindow : Window
 
         if (e.Key == Key.Escape)
         {
+            if (_vm.PrivacyOpen)
+            {
+                _vm.ClosePrivacy();
+                e.Handled = true;
+                return;
+            }
+
             if (_vm.LocationsOpen)
             {
                 _vm.CloseLocations();
@@ -106,7 +113,7 @@ public partial class MainWindow : Window
             return;
 
         var inTextBox = Keyboard.FocusedElement is TextBox;
-        if (!inTextBox && !_vm.RenameOpen && !_vm.DeleteOpen && !_vm.BoardOpen && !_vm.AboutOpen && !_vm.LocationsOpen && _hoverFile is not null)
+        if (!inTextBox && !_vm.RenameOpen && !_vm.DeleteOpen && !_vm.BoardOpen && !_vm.AboutOpen && !_vm.LocationsOpen && !_vm.PrivacyOpen && _hoverFile is not null)
         {
             if (e.Key == Key.F2)
             {
@@ -394,4 +401,16 @@ public partial class MainWindow : Window
 
     private async void OnAboutUpdateClick(object sender, RoutedEventArgs e)
         => await _vm.RunUpdateActionAsync();
+
+    // ------------------------------------------------------------ paylaşım denetimi
+
+    private void OnOpenPrivacyClick(object sender, RoutedEventArgs e) => _vm.OpenPrivacy();
+
+    private void OnClosePrivacyClick(object sender, RoutedEventArgs e) => _vm.ClosePrivacy();
+
+    private void OnPrivacyScrimClick(object sender, MouseButtonEventArgs e) => _vm.ClosePrivacy();
+
+    private void OnRefreshPrivacyClick(object sender, RoutedEventArgs e) => _vm.RefreshPrivacyCheck();
+
+    private void OnCopyPrivacyClick(object sender, RoutedEventArgs e) => _vm.CopyPrivacySummary();
 }

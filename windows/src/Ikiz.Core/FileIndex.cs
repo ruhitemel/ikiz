@@ -46,6 +46,9 @@ public sealed class FileIndex
     public int TotalCount => _snapshot.Length;
     public int AliveCount => _snapshot.Length - _removed.Count;
 
+    /// <summary>Gizlilik denetimi gibi salt okuma gereksinimleri için anlık dosya listesi.</summary>
+    public IReadOnlyList<FileItem> Snapshot => _snapshot;
+
     public void ReplaceAll(IReadOnlyList<FileCandidate> candidates)
     {
         var items = new FileItem[candidates.Count];

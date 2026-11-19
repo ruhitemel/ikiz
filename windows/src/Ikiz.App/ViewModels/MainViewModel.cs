@@ -35,6 +35,7 @@ public sealed partial class MainViewModel : BindableBase
             ToastVisible = false;
             ToastCanUndo = false;
         };
+        _scanElapsedTimer.Tick += (_, _) => UpdateScanTiming();
     }
 
     public TypeChipVm? SelectedType
@@ -260,11 +261,12 @@ public sealed partial class MainViewModel : BindableBase
         ResultSummary = "Taranıyor…";
         ElapsedText = "";
         RefreshRoots();
+        StartScanProgress();
 
         var progress = new Progress<ScanProgress>(p =>
         {
             if (!cts.IsCancellationRequested)
-                ScanText = $"Taranıyor… {HumanSize.Number(p.Files)} dosya";
+                ReportScanProgress(p);
         });
 
         try
@@ -274,6 +276,7 @@ public sealed partial class MainViewModel : BindableBase
             cts.Token.ThrowIfCancellationRequested();
 
             _index.ReplaceAll(candidates);
+            RememberScanCount(candidates.Count);
             IndexStatus = $"İndeks hazır · {HumanSize.Number(_index.AliveCount)} dosya";
             ScanText = "";
             Toast($"{HumanSize.Number(candidates.Count)} dosya indekslendi");
@@ -296,6 +299,7 @@ public sealed partial class MainViewModel : BindableBase
             if (ReferenceEquals(_scanCts, cts))
             {
                 IsScanning = false;
+                StopScanProgress();
                 ScanText = "";
             }
         }
