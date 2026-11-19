@@ -45,9 +45,8 @@ public static partial class PrivacyCheckService
 
             new("Kişisel yol",
                 roots.Count == 0
-                    ? "Tanımlı tarama kökü yok."
-                    : $"{roots.Count} kök yalnızca bu cihazda tutuluyor; gösterimde kullanıcı adı maskelenir. " +
-                      MaskPath(roots[0]),
+                    ? "Tanımlı tarama kökü yok; paylaşımda yol bilgisi yok."
+                    : $"{roots.Count} tarama kökü yalnızca bu cihazda tutuluyor. Kök yolu, dizin adı veya sürücü harfi bu ekranda ve özette hiç gösterilmez; yalnızca sayı belirtilir.",
                 true),
 
             new("Kullanıcı adı",
@@ -97,20 +96,6 @@ public static partial class PrivacyCheckService
         {
             return "";
         }
-    }
-
-    private static string MaskPath(string path)
-    {
-        var masked = path;
-        var profile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-        if (!string.IsNullOrWhiteSpace(profile))
-            masked = masked.Replace(profile, "<kullanıcı>", StringComparison.OrdinalIgnoreCase);
-
-        var user = Environment.UserName;
-        if (!string.IsNullOrWhiteSpace(user))
-            masked = masked.Replace(user, "<kullanıcı>", StringComparison.OrdinalIgnoreCase);
-
-        return masked.Length > 96 ? masked[..96] + "…" : masked;
     }
 
     private static string Humanize(int count) => count.ToString("N0", new System.Globalization.CultureInfo("tr-TR"));

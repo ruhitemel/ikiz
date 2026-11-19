@@ -1258,7 +1258,7 @@
         <!-- Hakkında -->
         <Grid Grid.RowSpan="6" Panel.ZIndex="50"
               Visibility="{Binding AboutOpen, Converter={StaticResource BoolVis}}">
-            <Border Background="{DynamicResource ScrimBrush}" MouseLeftButtonDown="OnAboutScrimClick"/>
+            <Border Background="{DynamicResource Panel3Brush}" MouseLeftButtonDown="OnAboutScrimClick"/>
             <Border Width="548" MaxHeight="680" Background="{DynamicResource PanelBrush}"
                     BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" CornerRadius="16"
                     HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -1576,7 +1576,7 @@
         <!-- Paylaşım öncesi gizlilik denetimi -->
         <Grid Grid.RowSpan="6" Panel.ZIndex="70"
               Visibility="{Binding PrivacyOpen, Converter={StaticResource BoolVis}}">
-            <Border Background="{DynamicResource ScrimBrush}" MouseLeftButtonDown="OnPrivacyScrimClick"/>
+            <Border Background="{DynamicResource Panel3Brush}" MouseLeftButtonDown="OnPrivacyScrimClick"/>
             <Border Width="640" MaxHeight="720" Background="{DynamicResource PanelBrush}"
                     BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" CornerRadius="16"
                     HorizontalAlignment="Center" VerticalAlignment="Center">

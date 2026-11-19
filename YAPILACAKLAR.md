@@ -6,7 +6,7 @@ Kullanıcı geri bildirimlerinin işlenme sırası. Tamamlanan maddeler işaretl
 2. [x] **Geliştirici notu** — Hakkında bölümünde ad + "@ruhitemel" ve "açık kaynak, herkesin kullanımına açık" vurgusu.
 3. [x] **Paylaşım öncesi gizlilik denetimi** — kişisel dosya adı / kişi adı / yerel yol / e-posta / IP içermediğini madde madde özetleyen panel ve kopyalanabilir temiz özet.
 4. [x] **Panoya al davranışı** — pano otomatik açılmıyor; yalnızca sayı bildirimi güncelleniyor. Başlıktaki **Panoyu göster** düğmesiyle isteyince açılıyor.
-5. [x] **Testler, UIA doğrulaması, commit ve `v1.1.0` yayını** — 51/51 birim testi, 22 UIA kontrolü geçti; derleme 0 uyarı / 0 hata.
+5. [x] **Testler, UIA doğrulaması, commit ve yayın** — 51/51 birim testi, 22 UIA kontrolü geçti; derleme 0 uyarı / 0 hata. `v1.1.0` yayınlandı; opak arka plan ve özet düzeltmesi `v1.1.1` ile yayınlandı.
 
 ## Doğrulama özeti
 

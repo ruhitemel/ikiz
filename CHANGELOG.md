@@ -2,6 +2,15 @@
 
 Bu dosya [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) biçimini izler. Sürüm numaraları [Semantic Versioning](https://semver.org/lang/tr/) kullanır.
 
+## [1.1.1] - 2026-11-19
+
+### Düzeltildi
+
+- Paylaşım denetimi özetindeki " yerel yol içermez" ifadesiyle çelişen maskelenmiş yol örneği kaldırıldı; yalnızca kök sayısı gösteriliyor.
+- **Hakkında** ve **Paylaşım denetimi** panellerinin arkası opak hale getirildi; ekran görüntüsünde arka plandaki dosya adları ve yollar görünmüyor.
+
+[1.1.1]: https://github.com/ruhitemel/ikiz/releases/tag/v1.1.1
+
 ## [1.1.0] - 2026-11-19
 
 ### Eklendi
