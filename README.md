@@ -20,7 +20,7 @@ Windows için hızlı dosya arama ve çift kopya temizleme aracı. Everything be
 - **Açık/koyu tema** — Windows tercihiyle başlar, seçim kalıcıdır.
 - **Canlı tarama ilerlemesi** — animasyonlu ilerleme çubuğu, dosya sayısı, geçen süre, anlık hız ve tahmini kalan süre.
 - **Paylaşım öncesi gizlilik denetimi** — kişisel veri içermediğini madde madde doğrular; temiz özeti panoya kopyalar.
-- **Otomatik güncelleme** — kurulumlu sürümler GitHub Releases üzerinden yeni sürümü denetler, indirir ve yeniden başlatınca uygular.
+- **Otomatik güncelleme ve bildirim kartı** — kurulumlu sürümler her açılışta GitHub Releases üzerinden yeni sürümü denetler; güncelleme varsa sağ altta **İndir ve kur / Ertele** küçük uyarı kartı çıkar.
 - **Erişilebilirlik** — klavye kısayolları, ekran okuyucu etiketleri ve yüksek kontrastlı iki tema.
 
 ## Hızlı başlangıç (Windows)

@@ -2,6 +2,18 @@
 
 Bu dosya [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) biçimini izler. Sürüm numaraları [Semantic Versioning](https://semver.org/lang/tr/) kullanır.
 
+## [1.4.1] - 2026-11-20
+
+### Eklendi
+
+- **Güncelleme bildirim kartı (İndir ve kur / Ertele)** — yeni bir sürüm yayınlandığında uygulama açılışında ekranın sağ altında küçük bir bildirim kartı belirir; tek tıkla **İndir ve kur** (canlı ilerleme çubuğuyla indirir ve yeniden başlatır), **Ertele** veya **Sürüm notları** seçenekleri sunar.
+
+### Düzeltildi
+
+- **Hakkında alt çubuk yerleşimi** — "MIT lisansıyla açık kaynak…" metni ile **Paylaşım denetimi** ve **Kapat** düğmelerinin üst üste binmesine yol açan eksik sütun tanımı düzeltildi.
+
+[1.4.1]: https://github.com/ruhitemel/ikiz/releases/tag/v1.4.1
+
 ## [1.4.0] - 2026-11-20
 
 ### Eklendi

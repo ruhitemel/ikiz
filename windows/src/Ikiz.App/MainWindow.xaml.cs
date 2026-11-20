@@ -478,7 +478,17 @@ public partial class MainWindow : Window
 
     // ------------------------------------------------------------ hakkında / güncelleme
 
-    private void OnAboutClick(object sender, RoutedEventArgs e) => _vm.OpenAbout();
+    private void OnAboutClick(object sender, RoutedEventArgs e)
+    {
+        _vm.DismissUpdatePrompt();
+        _vm.OpenAbout();
+    }
+
+    private async void OnInstallUpdatePromptClick(object sender, RoutedEventArgs e)
+        => await _vm.InstallUpdateFromPromptAsync();
+
+    private void OnDismissUpdatePromptClick(object sender, RoutedEventArgs e)
+        => _vm.DismissUpdatePrompt();
 
     private void OnAboutCloseClick(object sender, RoutedEventArgs e) => _vm.CloseAbout();
 

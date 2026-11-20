@@ -11,7 +11,7 @@ Everything benzeri hızlı arama + **aynı ad + aynı boyut + aynı tür** kural
 - **`ikiz-win-Setup.exe`** — tek tıkla kurar, soru sormaz.
 - **`ikiz-win.msi`** — alışılmış sihirbazla kurulur: **İleri → İleri → Kurulum → Bitti**. "Bu kullanıcı için mi, tüm kullanıcılar için mi?" sorusu gelirse ev bilgisayarında **Bu kullanıcı için** yeterlidir.
 
-Kurulumlu sürüm GitHub Releases üzerinden yeni sürümü denetler. Kontrol açılışta yapılır; ayrıca **Hakkında → Güncellemeleri denetle** de diyebilirsin. Yeni sürüm indirilir, uygulama yeniden başlatıldığında kurulur. Taşınabilir (`Portable`) sürümde otomatik güncelleme yoktur; sürüm sayfasından yeni dosyayı indirmen gerekir.
+Kurulumlu sürüm her açılışta GitHub Releases üzerinden yeni sürümü denetler; yeni sürüm bulunduğunda ekranın sağ altında **Yeni güncelleme mevcut · İndir ve kur / Ertele** küçük uyarı kartı çıkar. Ayrıca **Hakkında → Güncellemeleri denetle** de diyebilirsin. Taşınabilir (`Portable`) sürümde otomatik güncelleme yoktur; sürüm sayfasından yeni dosyayı indirmen gerekir.
 
 ## Gereksinimler
 

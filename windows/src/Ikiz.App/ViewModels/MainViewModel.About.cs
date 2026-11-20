@@ -34,6 +34,32 @@ public sealed partial class MainViewModel
         private set => Set(ref _aboutOpen, value);
     }
 
+    private bool _updatePromptOpen;
+    public bool UpdatePromptOpen
+    {
+        get => _updatePromptOpen;
+        private set => Set(ref _updatePromptOpen, value);
+    }
+
+    private string _updatePromptVersion = "";
+    public string UpdatePromptTitle => string.IsNullOrEmpty(_updatePromptVersion)
+        ? "Yeni güncelleme mevcut"
+        : $"Yeni güncelleme mevcut (v{_updatePromptVersion})";
+
+    public string UpdatePromptDetail => _updatePhase switch
+    {
+        UpdatePhase.Downloading => $"Güncelleme indiriliyor… %{_updatePercent}",
+        UpdatePhase.Ready => "Güncelleme indirildi. Kurulum için yeniden başlatmaya hazır.",
+        _ => "GitHub üzerinde yeni sürüm yayınlandı. Şimdi indirip kurabilir veya erteleyebilirsin.",
+    };
+
+    public string UpdatePromptPrimaryText => _updatePhase switch
+    {
+        UpdatePhase.Downloading => $"İndiriliyor… %{_updatePercent}",
+        UpdatePhase.Ready => "Şimdi yeniden başlat",
+        _ => "İndir ve kur",
+    };
+
     public string AppVersion => _updateService.Version;
     public string AboutVersionText => "Sürüm " + AppVersion;
     public string DeveloperCredit => "Ruhi Temel (@ruhitemel)";
@@ -64,6 +90,8 @@ public sealed partial class MainViewModel
             Raise(nameof(UpdateActionText));
             Raise(nameof(UpdateStatus));
             Raise(nameof(UpdateProgress));
+            Raise(nameof(UpdatePromptDetail));
+            Raise(nameof(UpdatePromptPrimaryText));
         }
     }
 
@@ -130,11 +158,10 @@ public sealed partial class MainViewModel
         }
     }
 
-    /// <summary>Uygulama açılışında günde en fazla bir kez sessiz denetim yapar.</summary>
+    /// <summary>Uygulama açılışında arka planda yeni sürümü denetler ve varsa küçük uyarı kartını açar.</summary>
     public async Task CheckUpdatesSilentlyAsync()
     {
         if (!_updateService.IsInstalled) return;
-        if (!UpdateService.ShouldCheckSilently()) return;
 
         try
         {
@@ -144,9 +171,11 @@ public sealed partial class MainViewModel
 
             _pendingUpdate = info;
             _updatePhase = UpdatePhase.Available;
+            _updatePromptVersion = info.TargetFullRelease.Version.ToString();
             UpdateNotes = info.TargetFullRelease.NotesMarkdown ?? "";
-            UpdateStatus = $"Yeni sürüm v{info.TargetFullRelease.Version} hazır.";
+            UpdateStatus = $"Yeni sürüm v{_updatePromptVersion} hazır.";
             UpdateBadge = true;
+            UpdatePromptOpen = true;
             RaiseUpdateState();
         }
         catch (Exception ex)
@@ -154,6 +183,28 @@ public sealed partial class MainViewModel
             AppLog.Write("update-silent", ex);
         }
     }
+
+    /// <summary>Küçük güncelleme uyarısındaki "İndir ve kur" düğmesi: indirir ve tamamlanınca kurup yeniden başlatır.</summary>
+    public async Task InstallUpdateFromPromptAsync()
+    {
+        if (UpdateBusy) return;
+
+        if (_updatePhase == UpdatePhase.Ready)
+        {
+            ApplyUpdate();
+            return;
+        }
+
+        if (_pendingUpdate is null) return;
+        await DownloadUpdateAsync();
+        if (_updatePhase == UpdatePhase.Ready)
+        {
+            ApplyUpdate();
+        }
+    }
+
+    /// <summary>Küçük güncelleme uyarısını bu oturum için erteler (Hakkında simgesindeki rozet kalır).</summary>
+    public void DismissUpdatePrompt() => UpdatePromptOpen = false;
 
     private async Task CheckUpdatesAsync(bool manual)
     {
@@ -187,9 +238,11 @@ public sealed partial class MainViewModel
             {
                 _pendingUpdate = info;
                 _updatePhase = UpdatePhase.Available;
+                _updatePromptVersion = info.TargetFullRelease.Version.ToString();
                 UpdateNotes = info.TargetFullRelease.NotesMarkdown ?? "";
-                UpdateStatus = $"Yeni sürüm v{info.TargetFullRelease.Version} hazır.";
+                UpdateStatus = $"Yeni sürüm v{_updatePromptVersion} hazır.";
                 UpdateBadge = true;
+                if (!AboutOpen) UpdatePromptOpen = true;
             }
         }
         catch (Exception ex)
@@ -257,6 +310,9 @@ public sealed partial class MainViewModel
         Raise(nameof(UpdateActionText));
         Raise(nameof(CanRunUpdateAction));
         Raise(nameof(UpdateProgress));
+        Raise(nameof(UpdatePromptTitle));
+        Raise(nameof(UpdatePromptDetail));
+        Raise(nameof(UpdatePromptPrimaryText));
     }
 
     private static void OpenUrl(string url)

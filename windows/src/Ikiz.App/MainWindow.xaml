@@ -1018,6 +1018,64 @@
                     </Button>
                 </StackPanel>
             </Border>
+
+            <!-- Küçük güncelleme uyarısı (İndir ve kur / Ertele) -->
+            <Border Width="360" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource AccentBrush}"
+                    BorderThickness="1" CornerRadius="12" Padding="14,12"
+                    HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,16,16"
+                    Panel.ZIndex="25"
+                    Visibility="{Binding UpdatePromptOpen, Converter={StaticResource BoolVis}}">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="24" ShadowDepth="0" Opacity="0.48" Color="#000000"/>
+                </Border.Effect>
+                <StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Border Width="28" Height="28" CornerRadius="8" Background="{DynamicResource AccentSoftBrush}"
+                                Margin="0,0,10,0" VerticalAlignment="Top">
+                            <Path Data="{StaticResource GeoSpark}" Stroke="{DynamicResource AccentStrongBrush}"
+                                  StrokeThickness="1.5" Width="13" Height="13" Stretch="Uniform"/>
+                        </Border>
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="{Binding UpdatePromptTitle}" FontSize="13.5" FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding UpdatePromptDetail}" FontSize="11.5"
+                                       Foreground="{DynamicResource Muted2Brush}" TextWrapping="Wrap" Margin="0,2,0,0"/>
+                        </StackPanel>
+                        <Button Grid.Column="2" Style="{StaticResource IconButton}" Width="22" Height="22"
+                                Click="OnDismissUpdatePromptClick" VerticalAlignment="Top"
+                                AutomationProperties.Name="Güncelleme uyarısını ertele" ToolTip="Ertele">
+                            <Path Data="{StaticResource GeoClose}" Stroke="{DynamicResource MutedBrush}"
+                                  StrokeThickness="1.4" Width="9" Height="9" Stretch="Uniform"/>
+                        </Button>
+                    </Grid>
+
+                    <ProgressBar Height="4" Minimum="0" Maximum="100"
+                                 Value="{Binding UpdateProgress, Mode=OneWay}"
+                                 Background="{DynamicResource Panel2Brush}"
+                                 Foreground="{DynamicResource AccentBrush}"
+                                 BorderThickness="0" Margin="0,10,0,0"
+                                 Visibility="{Binding IsDownloading, Converter={StaticResource BoolVis}}"/>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,11,0,0">
+                        <Button Style="{StaticResource LinkButton}" Click="OnAboutClick"
+                                Margin="0,0,12,0" VerticalAlignment="Center"
+                                AutomationProperties.Name="Sürüm notlarını gör">
+                            <TextBlock Text="Sürüm notları" FontSize="11.5" Foreground="{DynamicResource MutedBrush}"/>
+                        </Button>
+                        <Button Style="{StaticResource GhostButton}" Content="Ertele"
+                                Click="OnDismissUpdatePromptClick" Height="28" Padding="11,0" Margin="0,0,7,0"
+                                AutomationProperties.Name="Güncellemeyi ertele"/>
+                        <Button Style="{StaticResource PrimaryButton}" Content="{Binding UpdatePromptPrimaryText}"
+                                Click="OnInstallUpdatePromptClick" Height="28" Padding="12,0"
+                                IsEnabled="{Binding CanRunUpdateAction}"
+                                AutomationProperties.Name="Güncellemeyi indir ve kur"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
         </Grid>
 
         <!-- Durum çubuğu -->
@@ -1212,10 +1270,14 @@
                             BorderBrush="{DynamicResource LineSoftBrush}" BorderThickness="0,1,0,0"
                             CornerRadius="0,0,16,16">
                         <Grid>
-                            <TextBlock Text="Uzantı korunur; çakışan adlara (2), (3) eklenir."
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Uzantı korunur; çakışan adlara (2), (3) eklenir."
                                        FontSize="11" Foreground="{DynamicResource Muted2Brush}"
-                                       VerticalAlignment="Center" MaxWidth="300" TextWrapping="Wrap"/>
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                       VerticalAlignment="Center" TextWrapping="Wrap" Margin="0,0,12,0"/>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
                                 <Button Style="{StaticResource GhostButton}" Content="Vazgeç"
                                         Click="OnRenameCloseClick" Margin="0,0,8,0"/>
                                 <Button Style="{StaticResource PrimaryButton}" Click="OnApplyRenameClick"
@@ -1360,10 +1422,14 @@
                             BorderBrush="{DynamicResource LineSoftBrush}" BorderThickness="0,1,0,0"
                             CornerRadius="0,0,16,16">
                         <Grid>
-                            <TextBlock Text="Onayın olmadan hiçbir işlem yapılmaz."
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Onayın olmadan hiçbir işlem yapılmaz."
                                        FontSize="11" Foreground="{DynamicResource Muted2Brush}"
-                                       VerticalAlignment="Center"/>
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                       VerticalAlignment="Center" TextWrapping="Wrap" Margin="0,0,12,0"/>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
                                 <Button Style="{StaticResource GhostButton}" Content="Vazgeç"
                                         Click="OnQuickDeleteCloseClick" Margin="0,0,8,0"/>
                                 <Button Style="{StaticResource PrimaryDangerButton}" Click="OnConfirmQuickDeleteClick"
@@ -1531,10 +1597,14 @@
                             BorderBrush="{DynamicResource LineSoftBrush}" BorderThickness="0,1,0,0"
                             CornerRadius="0,0,16,16">
                         <Grid>
-                            <TextBlock Text="MIT lisansıyla açık kaynak · herkesin kullanımına açık · güncellemeler GitHub Releases'tan"
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="MIT lisansıyla açık kaynak · herkesin kullanımına açık · güncellemeler GitHub Releases'tan"
                                        FontSize="10.5" Foreground="{DynamicResource Muted2Brush}"
-                                       VerticalAlignment="Center" TextWrapping="Wrap" MaxWidth="250" Margin="0,0,10,0"/>
-                            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                                       VerticalAlignment="Center" TextWrapping="Wrap" Margin="0,0,14,0"/>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                                 <Button Style="{StaticResource GhostButton}" Content="Paylaşım denetimi"
                                         Click="OnOpenPrivacyClick" Margin="0,0,8,0"
                                         AutomationProperties.Name="Paylaşım denetimini aç"/>
