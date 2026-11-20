@@ -66,32 +66,18 @@ public sealed class UpdateService
         _manager?.ApplyUpdatesAndRestart(info.TargetFullRelease);
     }
 
-    public static bool ShouldCheckSilently()
-    {
-        try
-        {
-            var path = Path.Combine(AppPaths.DataDirectory, "last-update-check.txt");
-            if (!File.Exists(path)) return true;
-            var text = File.ReadAllText(path).Trim();
-            return text != DateTime.Now.ToString("yyyy-MM-dd");
-        }
-        catch
-        {
-            return true;
-        }
-    }
+    public static bool ShouldCheckSilently() => true;
 
     public static void MarkChecked()
     {
         try
         {
-            Directory.CreateDirectory(AppPaths.DataDirectory);
-            File.WriteAllText(Path.Combine(AppPaths.DataDirectory, "last-update-check.txt"),
-                DateTime.Now.ToString("yyyy-MM-dd"));
+            var path = Path.Combine(AppPaths.DataDirectory, "last-update-check.txt");
+            if (File.Exists(path)) File.Delete(path);
         }
         catch
         {
-            // denetim damgası yazılamazsa sessizce devam et
+            // eski denetim damgası silinemezse sessizce devam et
         }
     }
 }

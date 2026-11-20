@@ -12,7 +12,7 @@ Kullanıcı geri bildirimlerinin işlenme sırası. Tamamlanan maddeler işaretl
 8. [x] **Güvenlik ve tersine mühendislik sertleştirmesi** — `RuntimeGuard` (SHA-256 URL/bütünlük sabitleme, anti-debugger/profiler/startup-hook, DLL side-loading kontrolü), ReadyToRun yerel kod derlemesi, silme/adlandırma TOCTOU + `ReparsePoint` koruması, `OpenUrl` HTTPS kısıtı ve günlük maskeleme eklendi. `v1.2.2`.
 9. [x] **Boş klasör ve 0 KB dosya tarama ve onaylı silme** — tek geçişte boş klasör ve 0 KB dosya tespiti, **Boş klasör ve 0 KB** filtresi, **Boş / 0 KB seç** hızlı seçimi, onaylı Geri Dönüşüm Kutusu / kalıcı silme ve geri alma desteği eklendi. `v1.3.0`.
 10. [x] **3 sabit sekme, SHA-256 karşılaştırma ekranı ve klasörde göster** — **Çift Kopyalar / Hızlı Dosya Arama / Boş Klasör ve 0 KB** sabit sekmeleri, SHA-256 içerik parmak izi doğrulamalı **Karşılaştırma ekranı** (**En eskiyi koru / En yeniyi koru**) ve sağ tık **Dosya konumunu aç (Klasörde göster)** / **Kayıtlı olduğu klasörü aç** eklendi. `v1.4.0`.
-11. [x] **Küçük güncelleme uyarı kartı (İndir ve kur / Ertele)** — yeni sürüm çıktığında açılışta sağ altta beliren kompakt bildirim kartı eklendi. `v1.4.1`.
+11. [x] **Küçük güncelleme uyarı kartı (İndir ve kur / Ertele)** — yeni sürüm çıktığında açılışta ve açık kaldığı sürece periyodik olarak sağ altta beliren kompakt bildirim kartı ve Hakkında alt çubuk yerleşim düzeltmesi eklendi. `v1.4.1` / `v1.4.2`.
 
 ## Doğrulama özeti
 

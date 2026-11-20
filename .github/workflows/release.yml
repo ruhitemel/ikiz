@@ -38,14 +38,14 @@ jobs:
       - name: Sürüm notlarını ve kurulum metinlerini hazırla
         shell: pwsh
         run: |
-          $raw = Get-Content -Raw CHANGELOG.md
+          $raw = Get-Content -Raw -Encoding utf8 CHANGELOG.md
           $pattern = '(?ms)^## \[' + [regex]::Escape($env:VERSION) + '\].*?(?=^## \[|\z)'
           $match = [regex]::Match($raw, $pattern)
           if (-not $match.Success) { throw "$env:VERSION için sürüm notu bulunamadı." }
           $notes = $match.Value -replace '(?m)^\[.*\]:\s*\S+\s*$', ''
           [IO.File]::WriteAllText((Join-Path $pwd 'RELEASE_NOTES.md'), $notes.Trim(), (New-Object Text.UTF8Encoding($false)))
           Copy-Item LICENSE (Join-Path $pwd 'lisans.txt')
-          Get-Content RELEASE_NOTES.md
+          Get-Content -Encoding utf8 RELEASE_NOTES.md
 
       - name: Derle ve test et
         shell: pwsh

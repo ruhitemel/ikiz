@@ -338,6 +338,7 @@ public sealed partial class MainViewModel : BindableBase
         _scanCts?.Cancel();
         _searchCts?.Cancel();
         _toastTimer.Stop();
+        _updatePollTimer.Stop();
     }
 
     private async Task ScanAsync()

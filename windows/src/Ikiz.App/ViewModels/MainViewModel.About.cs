@@ -20,6 +20,10 @@ public enum UpdatePhase
 public sealed partial class MainViewModel
 {
     private readonly UpdateService _updateService = new();
+    private readonly System.Windows.Threading.DispatcherTimer _updatePollTimer = new()
+    {
+        Interval = TimeSpan.FromMinutes(5),
+    };
     private UpdateInfo? _pendingUpdate;
     private UpdatePhase _updatePhase = UpdatePhase.Idle;
     private string _updateStatus = "Güncellemeler henüz denetlenmedi.";
@@ -158,10 +162,27 @@ public sealed partial class MainViewModel
         }
     }
 
-    /// <summary>Uygulama açılışında arka planda yeni sürümü denetler ve varsa küçük uyarı kartını açar.</summary>
+    /// <summary>Uygulama açılışında ve açık kaldığı sürece periyodik olarak arka planda yeni sürümü denetler.</summary>
     public async Task CheckUpdatesSilentlyAsync()
     {
         if (!_updateService.IsInstalled) return;
+
+        if (!_updatePollTimer.IsEnabled)
+        {
+            _updatePollTimer.Tick += async (_, _) =>
+            {
+                if (_updatePhase is UpdatePhase.Idle or UpdatePhase.UpToDate or UpdatePhase.Failed)
+                    await CheckUpdatesSilentlyCoreAsync();
+            };
+            _updatePollTimer.Start();
+        }
+
+        await CheckUpdatesSilentlyCoreAsync();
+    }
+
+    private async Task CheckUpdatesSilentlyCoreAsync()
+    {
+        if (!_updateService.IsInstalled || UpdateBusy) return;
 
         try
         {
@@ -169,13 +190,17 @@ public sealed partial class MainViewModel
             UpdateService.MarkChecked();
             if (info is null) return;
 
+            var newVersion = info.TargetFullRelease.Version.ToString();
+            var isNewNotice = !string.Equals(_updatePromptVersion, newVersion, StringComparison.Ordinal);
+
             _pendingUpdate = info;
             _updatePhase = UpdatePhase.Available;
-            _updatePromptVersion = info.TargetFullRelease.Version.ToString();
+            _updatePromptVersion = newVersion;
             UpdateNotes = info.TargetFullRelease.NotesMarkdown ?? "";
             UpdateStatus = $"Yeni sürüm v{_updatePromptVersion} hazır.";
             UpdateBadge = true;
-            UpdatePromptOpen = true;
+            if (isNewNotice || !UpdatePromptOpen)
+                UpdatePromptOpen = true;
             RaiseUpdateState();
         }
         catch (Exception ex)

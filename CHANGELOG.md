@@ -2,6 +2,18 @@
 
 Bu dosya [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) biçimini izler. Sürüm numaraları [Semantic Versioning](https://semver.org/lang/tr/) kullanır.
 
+## [1.4.2] - 2026-11-20
+
+### Eklendi
+
+- **Anlık ve periyodik otomatik güncelleme denetimi** — günlük denetim kilidi (`last-update-check.txt`) kaldırıldı; uygulama hem her açılışta hem de açık kaldığı sürece arka planda yeni sürümü denetler ve sağ alttaki **İndir ve kur / Ertele** uyarısını otomatik gösterir.
+
+### Düzeltildi
+
+- **Sürüm notları karakter kodlaması** — yayın iş akışında Türkçe karakterlerin UTF-8 olarak paketlenmesi düzeltildi.
+
+[1.4.2]: https://github.com/ruhitemel/ikiz/releases/tag/v1.4.2
+
 ## [1.4.1] - 2026-11-20
 
 ### Eklendi
