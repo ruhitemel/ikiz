@@ -163,7 +163,10 @@ public partial class MainWindow : Window
     {
         if (sender is Button { Tag: FileRowVm row })
         {
-            _vm.StageGroup(row.File.DuplicateKey);
+            if (row.File.IsDirectory || _vm.OnlyEmptyItems || _vm.CopyCount(row.File) <= 1)
+                _vm.StageFile(row.File);
+            else
+                _vm.StageGroup(row.File.DuplicateKey);
             e.Handled = true;
         }
     }
@@ -179,6 +182,8 @@ public partial class MainWindow : Window
     private void OnPickAllClick(object sender, RoutedEventArgs e) => _vm.PickAll();
 
     private void OnPickCopiesClick(object sender, RoutedEventArgs e) => _vm.PickCopies();
+
+    private void OnPickEmptyItemsClick(object sender, RoutedEventArgs e) => _vm.PickEmptyItems();
 
     private void OnClearPicksClick(object sender, RoutedEventArgs e) => _vm.ClearPicks();
 
@@ -284,8 +289,10 @@ public partial class MainWindow : Window
 
         SetMenuItem(menu, "stage", visible: !inBoard);
         SetMenuItem(menu, "unstage", visible: inBoard);
-        SetMenuItem(menu, "deleteCopies", visible: copyCount > 1);
-        SetMenuItem(menu, "deleteOthers", visible: copyCount > 1);
+        SetMenuItem(menu, "rename", visible: !file.IsDirectory);
+        SetMenuItem(menu, "renameType", visible: !file.IsDirectory);
+        SetMenuItem(menu, "deleteCopies", visible: !file.IsDirectory && copyCount > 1);
+        SetMenuItem(menu, "deleteOthers", visible: !file.IsDirectory && copyCount > 1);
         SetMenuItem(menu, "undo", enabled: _vm.CanUndoDelete);
 
         if (MenuItemByTag(menu, "undo") is { } undo)
@@ -303,6 +310,10 @@ public partial class MainWindow : Window
             return;
         }
 
+        var isEmptyGroup = _menuGroup.IsEmptyGroup;
+        SetMenuItem(menu, "renameGroup", visible: !isEmptyGroup);
+        SetMenuItem(menu, "renameType", visible: !isEmptyGroup);
+        SetMenuItem(menu, "deleteOthers", visible: !isEmptyGroup);
         SetMenuItem(menu, "undo", enabled: _vm.CanUndoDelete);
         if (MenuItemByTag(menu, "undo") is { } undo)
             undo.Header = _vm.UndoMenuText;

@@ -31,7 +31,11 @@ public sealed partial class MainViewModel
     public void PickCopies()
     {
         _picked.Clear();
-        if (_lastResult is not null && _lastResult.Groups.Count > 0)
+        if (OnlyEmptyItems)
+        {
+            foreach (var file in VisibleFiles()) _picked.Add(file.Id);
+        }
+        else if (_lastResult is not null && _lastResult.Groups.Count > 0)
         {
             foreach (var group in _lastResult.Groups)
                 foreach (var file in group.Files.Skip(1))
@@ -46,6 +50,27 @@ public sealed partial class MainViewModel
 
         RaisePicked();
         TriggerSearch(immediate: true);
+    }
+
+    /// <summary>Boş klasörleri ve 0 KB dosyaları gösterir ve tümünü toplu işlem için seçer.</summary>
+    public void PickEmptyItems()
+    {
+        if (!_onlyEmptyItems)
+        {
+            _onlyEmptyItems = true;
+            Raise(nameof(OnlyEmptyItems));
+        }
+
+        var result = _index.Search(BuildRequest());
+        _picked.Clear();
+        foreach (var group in result.Groups)
+            foreach (var f in group.Files)
+                _picked.Add(f.Id);
+        foreach (var f in result.Files)
+            _picked.Add(f.Id);
+
+        RaisePicked();
+        ApplyResult(result, TimeSpan.Zero);
     }
 
     public void ClearPicks()
@@ -92,8 +117,12 @@ public sealed partial class MainViewModel
 
     public void RenamePicked()
     {
-        var files = PickedFiles();
-        if (files.Count == 0) return;
+        var files = PickedFiles().Where(f => !f.IsDirectory).ToList();
+        if (files.Count == 0)
+        {
+            Toast("Klasörler bu menüden adlandırılamaz; yalnızca dosya seç.", error: true);
+            return;
+        }
         OpenPickedRename(files);
     }
 

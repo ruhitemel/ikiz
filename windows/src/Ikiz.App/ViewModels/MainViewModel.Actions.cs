@@ -60,6 +60,11 @@ public sealed partial class MainViewModel
     {
         var files = _index.GetByKey(key);
         if (files.Count == 0) return;
+        if (FileIndex.IsEmptyGroupKey(key))
+        {
+            OpenPickedQuickDelete(files);
+            return;
+        }
         OpenQuickDelete(files[0], files.Count > 1 ? scope : "one");
     }
 
@@ -197,6 +202,11 @@ public sealed partial class MainViewModel
 
     public void OpenRename(FileItem file, string scope = "one")
     {
+        if (file.IsDirectory)
+        {
+            Toast("Klasörler bu menüden adlandırılamaz.", error: true);
+            return;
+        }
         _renameFile = file;
         _renameOne = new List<FileItem> { file };
         _renameGroup = _index.GetByKey(file.DuplicateKey).ToList();

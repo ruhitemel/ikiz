@@ -2,6 +2,16 @@
 
 Bu dosya [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) biçimini izler. Sürüm numaraları [Semantic Versioning](https://semver.org/lang/tr/) kullanır.
 
+## [1.3.0] - 2026-11-19
+
+### Eklendi
+
+- **Boş klasör ve 0 KB dosya tarama ve onaylı temizleme** — tarama sırasında ek disk okuması yapmadan içeriksiz boş klasörleri (`KLS`) ve `0 KB` boyutundaki dosyaları tespit eder.
+- **Boş klasör ve 0 KB görünümü** — filtre çubuğundaki **Boş klasör ve 0 KB** anahtarı ve seçim çubuğundaki **Boş / 0 KB seç** kısayolu ile **Boş klasörler** ve **0 KB dosyalar** gruplarını anında listeler ve seçer.
+- **Onaylı silme ve geri alma** — boş klasörler ve 0 KB dosyalar aynı silme panosu, onay kutusu, Geri Dönüşüm Kutusu (varsayılan) / kalıcı silme ve son silmeyi geri alma akışıyla temizlenir; silme anında klasörün gerçekten boş olduğu (TOCTOU) doğrulanır.
+
+[1.3.0]: https://github.com/ruhitemel/ikiz/releases/tag/v1.3.0
+
 ## [1.2.2] - 2026-11-19
 
 ### Güvenlik

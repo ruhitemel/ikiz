@@ -4,6 +4,8 @@ public sealed record ScanProgress(int Files, string CurrentDirectory);
 
 public static class FolderScanner
 {
+    public const string FolderExtension = "klasör";
+
     private static readonly HashSet<string> SkipNames = new(StringComparer.OrdinalIgnoreCase)
     {
         "$recycle.bin",
@@ -49,10 +51,14 @@ public static class FolderScanner
                 var dir = stack.Pop();
                 if (ShouldSkipDirectory(dir)) continue;
 
+                var hasAnyEntry = false;
+                var canCheckEmpty = true;
+
                 try
                 {
                     foreach (var file in System.IO.Directory.EnumerateFiles(dir))
                     {
+                        hasAnyEntry = true;
                         token.ThrowIfCancellationRequested();
                         FileInfo info;
                         try
@@ -87,14 +93,15 @@ public static class FolderScanner
                             progress?.Report(new ScanProgress(files.Count, dir));
                     }
                 }
-                catch (UnauthorizedAccessException) { }
-                catch (IOException) { }
-                catch (System.Security.SecurityException) { }
+                catch (UnauthorizedAccessException) { canCheckEmpty = false; }
+                catch (IOException) { canCheckEmpty = false; }
+                catch (System.Security.SecurityException) { canCheckEmpty = false; }
 
                 try
                 {
                     foreach (var sub in System.IO.Directory.EnumerateDirectories(dir))
                     {
+                        hasAnyEntry = true;
                         try
                         {
                             var attrs = File.GetAttributes(sub);
@@ -108,9 +115,33 @@ public static class FolderScanner
                         stack.Push(sub);
                     }
                 }
-                catch (UnauthorizedAccessException) { }
-                catch (IOException) { }
-                catch (System.Security.SecurityException) { }
+                catch (UnauthorizedAccessException) { canCheckEmpty = false; }
+                catch (IOException) { canCheckEmpty = false; }
+                catch (System.Security.SecurityException) { canCheckEmpty = false; }
+
+                if (canCheckEmpty && !hasAnyEntry && !seenRoots.Contains(dir))
+                {
+                    try
+                    {
+                        var dirInfo = new DirectoryInfo(dir);
+                        if (dirInfo.Exists &&
+                            (dirInfo.Attributes & (FileAttributes.Hidden | FileAttributes.System | FileAttributes.ReparsePoint)) == 0)
+                        {
+                            files.Add(new FileCandidate(
+                                dirInfo.FullName,
+                                dirInfo.Name,
+                                Path.GetDirectoryName(dirInfo.FullName) ?? dir,
+                                FolderExtension,
+                                0,
+                                dirInfo.LastWriteTimeUtc,
+                                IsDirectory: true));
+                        }
+                    }
+                    catch
+                    {
+                        // okunamayan klasör atlanır
+                    }
+                }
             }
         }
 

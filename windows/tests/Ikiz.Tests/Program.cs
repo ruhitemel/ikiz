@@ -232,6 +232,38 @@ try
         Check("geri dönüşüm kutusu", recycle.Deleted.Count == 1 && !File.Exists(p3),
             string.Join("; ", recycle.Failed.Select(f => f.Error)));
     }
+
+    var emptyDir1 = Path.Combine(temp, "BosKlasor1");
+    var emptyDir2 = Path.Combine(temp, "BosKlasor2");
+    var nonEmptyDir = Path.Combine(temp, "DoluKlasor");
+    Directory.CreateDirectory(emptyDir1);
+    Directory.CreateDirectory(emptyDir2);
+    Directory.CreateDirectory(nonEmptyDir);
+    var zeroFile = Path.Combine(nonEmptyDir, "sifir.txt");
+    var normalFile = Path.Combine(nonEmptyDir, "dolu.txt");
+    File.WriteAllText(zeroFile, "");
+    File.WriteAllText(normalFile, "icerik");
+
+    var scanned = FolderScanner.Scan(new[] { temp }, progress: null, CancellationToken.None);
+    var emptyIdx = new FileIndex();
+    emptyIdx.ReplaceAll(scanned);
+    Check("boş klasör sayısı 2", emptyIdx.AliveEmptyFolderCount == 2, emptyIdx.AliveEmptyFolderCount.ToString());
+    Check("0 KB dosya sayısı 1", emptyIdx.AliveZeroByteFileCount == 1, emptyIdx.AliveZeroByteFileCount.ToString());
+
+    var emptySearch = emptyIdx.Search(new SearchRequest { OnlyEmptyItems = true, GroupMode = true });
+    Check("boş ve 0 KB arama 2 grup döner", emptySearch.Groups.Count == 2 && emptySearch.MatchedCount == 3,
+        $"{emptySearch.Groups.Count}/{emptySearch.MatchedCount}");
+
+    var nonEmptyDirItem = new FileItem { Id = 999, FullPath = nonEmptyDir, Name = "DoluKlasor", Directory = temp, Extension = "klasör", Size = 0, IsDirectory = true };
+    var blockedNonEmpty = FileDeleter.Delete(new[] { nonEmptyDirItem }, DeleteMode.Permanent);
+    Check("dolu klasör silinmez", blockedNonEmpty.Deleted.Count == 0 && blockedNonEmpty.Failed.Count == 1 && Directory.Exists(nonEmptyDir));
+
+    var emptyTargets = emptyIdx.GetByKey(FileIndex.EmptyFoldersGroupKey)
+        .Concat(emptyIdx.GetByKey(FileIndex.ZeroFilesGroupKey))
+        .ToList();
+    var deletedEmpty = FileDeleter.Delete(emptyTargets, DeleteMode.Permanent);
+    Check("boş klasörler ve 0 KB dosya onaylı silinir",
+        deletedEmpty.Deleted.Count == 3 && !Directory.Exists(emptyDir1) && !Directory.Exists(emptyDir2) && !File.Exists(zeroFile) && File.Exists(normalFile));
 }
 finally
 {

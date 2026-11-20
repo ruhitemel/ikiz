@@ -71,6 +71,17 @@ public sealed partial class MainViewModel : BindableBase
         }
     }
 
+    private bool _onlyEmptyItems;
+    public bool OnlyEmptyItems
+    {
+        get => _onlyEmptyItems;
+        set
+        {
+            if (!Set(ref _onlyEmptyItems, value)) return;
+            TriggerSearch(immediate: true);
+        }
+    }
+
     private bool _groupMode = true;
     public bool GroupMode
     {
@@ -344,6 +355,7 @@ public sealed partial class MainViewModel : BindableBase
         Type = SelectedType?.Key ?? "all",
         Sort = SortKey,
         OnlyDuplicates = OnlyDuplicates,
+        OnlyEmptyItems = OnlyEmptyItems,
         GroupMode = GroupMode,
         HiddenIds = HiddenIds(),
     };
@@ -382,6 +394,7 @@ public sealed partial class MainViewModel : BindableBase
             foreach (var g in result.Groups)
             {
                 var expanded = !_collapsed.Contains(g.Key);
+                var isEmptyGroup = FileIndex.IsEmptyGroupKey(g.Key);
                 Rows.Add(HeaderVm(g, expanded));
                 if (!expanded) continue;
                 var index = 0;
@@ -391,9 +404,9 @@ public sealed partial class MainViewModel : BindableBase
                     Rows.Add(new FileRowVm
                     {
                         File = f,
-                        CopyIndex = index,
-                        CopyCount = g.Count,
-                        IsDuplicate = true,
+                        CopyIndex = isEmptyGroup ? 1 : index,
+                        CopyCount = isEmptyGroup ? 1 : g.Count,
+                        IsDuplicate = !isEmptyGroup,
                         IsPicked = _picked.Contains(f.Id),
                     });
                 }
@@ -405,8 +418,8 @@ public sealed partial class MainViewModel : BindableBase
             var seen = new Dictionary<string, int>(StringComparer.Ordinal);
             foreach (var f in result.Files)
             {
-                var count = counts.GetValueOrDefault(f.DuplicateKey);
-                var copy = seen.GetValueOrDefault(f.DuplicateKey) + 1;
+                var count = OnlyEmptyItems ? 1 : counts.GetValueOrDefault(f.DuplicateKey);
+                var copy = OnlyEmptyItems ? 1 : seen.GetValueOrDefault(f.DuplicateKey) + 1;
                 seen[f.DuplicateKey] = copy;
                 Rows.Add(new FileRowVm
                 {
@@ -421,12 +434,21 @@ public sealed partial class MainViewModel : BindableBase
 
         UpdateTypes(result);
 
-        ResultSummary = $"{HumanSize.Number(result.MatchedCount)} dosya · {HumanSize.Number(result.DuplicateGroupCount)} çift grup";
+        if (OnlyEmptyItems)
+        {
+            ResultSummary = $"{HumanSize.Number(result.EmptyFolderCount)} boş klasör · {HumanSize.Number(result.ZeroByteFileCount)} sıfır KB dosya";
+            SectionTitle = "Boş klasör ve 0 KB dosyalar";
+            SectionMeta = $"{HumanSize.Number(result.EmptyFolderCount)} boş klasör · {HumanSize.Number(result.ZeroByteFileCount)} sıfır KB dosya";
+        }
+        else
+        {
+            ResultSummary = $"{HumanSize.Number(result.MatchedCount)} dosya · {HumanSize.Number(result.DuplicateGroupCount)} çift grup";
+            SectionTitle = GroupMode ? "Çift kopyalar" : "Dosyalar";
+            SectionMeta = GroupMode
+                ? $"{HumanSize.Number(result.DuplicateGroupCount)} grup · {HumanSize.Format(result.TotalWaste)} kazanılabilir"
+                : $"{HumanSize.Number(result.Files.Count)} dosya";
+        }
         ElapsedText = elapsed.TotalMilliseconds.ToString("0.0", System.Globalization.CultureInfo.GetCultureInfo("tr-TR")) + " ms";
-        SectionTitle = GroupMode ? "Çift kopyalar" : "Dosyalar";
-        SectionMeta = GroupMode
-            ? $"{HumanSize.Number(result.DuplicateGroupCount)} grup · {HumanSize.Format(result.TotalWaste)} kazanılabilir"
-            : $"{HumanSize.Number(result.Files.Count)} dosya";
         if (result.Truncated) SectionMeta += " · ilk sonuçlar gösteriliyor";
 
         HasResults = Rows.Count > 0;
@@ -439,6 +461,11 @@ public sealed partial class MainViewModel : BindableBase
             {
                 EmptyTitle = "Görünen dosya kalmadı";
                 EmptyHint = "Tüm sonuçlar panoda. Panoyu göster ile işlemini tamamla veya filtredeki 'Panodakileri gizle'yi kapat.";
+            }
+            else if (OnlyEmptyItems)
+            {
+                EmptyTitle = "Boş klasör veya 0 KB dosya bulunamadı";
+                EmptyHint = "Taranan konumlarda boş klasör ya da 0 KB boyutunda dosya yok.";
             }
             else if (_index.AliveCount == 0)
             {
@@ -502,18 +529,28 @@ public sealed partial class MainViewModel : BindableBase
         _updatingTypes = false;
     }
 
-    private GroupHeaderVm HeaderVm(DuplicateGroup g, bool expanded) => new()
+    private GroupHeaderVm HeaderVm(DuplicateGroup g, bool expanded)
     {
-        Key = g.Key,
-        Name = g.Name,
-        ExtLabel = string.IsNullOrEmpty(g.Extension) ? "DOS" : g.Extension.ToUpperInvariant(),
-        Color = FileTypeStyle.Color(g.Extension),
-        Count = g.Count,
-        Size = g.Size,
-        Waste = g.Waste,
-        PathHint = g.Files.Count > 0 ? g.Files[0].Directory : "",
-        Expanded = expanded,
-    };
+        var isEmptyGroup = FileIndex.IsEmptyGroupKey(g.Key);
+        var extLabel = g.Key == FileIndex.EmptyFoldersGroupKey
+            ? "KLS"
+            : g.Key == FileIndex.ZeroFilesGroupKey
+                ? "0KB"
+                : string.IsNullOrEmpty(g.Extension) ? "DOS" : g.Extension.ToUpperInvariant();
+        return new GroupHeaderVm
+        {
+            Key = g.Key,
+            Name = g.Name,
+            ExtLabel = extLabel,
+            Color = FileTypeStyle.Color(g.Extension),
+            Count = g.Count,
+            Size = g.Size,
+            Waste = g.Waste,
+            PathHint = g.Files.Count > 0 ? g.Files[0].Directory : "",
+            Expanded = expanded,
+            IsEmptyGroup = isEmptyGroup,
+        };
+    }
 
     public void ToggleGroup(string key)
     {
@@ -525,6 +562,7 @@ public sealed partial class MainViewModel : BindableBase
         foreach (var g in result.Groups)
         {
             var expanded = !_collapsed.Contains(g.Key);
+            var isEmptyGroup = FileIndex.IsEmptyGroupKey(g.Key);
             Rows.Add(HeaderVm(g, expanded));
             if (!expanded) continue;
             var index = 0;
@@ -534,9 +572,9 @@ public sealed partial class MainViewModel : BindableBase
                 Rows.Add(new FileRowVm
                 {
                     File = f,
-                    CopyIndex = index,
-                    CopyCount = g.Count,
-                    IsDuplicate = true,
+                    CopyIndex = isEmptyGroup ? 1 : index,
+                    CopyCount = isEmptyGroup ? 1 : g.Count,
+                    IsDuplicate = !isEmptyGroup,
                     IsPicked = _picked.Contains(f.Id),
                 });
             }

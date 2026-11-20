@@ -116,7 +116,7 @@ public static class RecycleBinRestorer
                 var ok = false;
                 for (var wait = 0; wait < 12; wait++)
                 {
-                    if (File.Exists(path)) { ok = true; break; }
+                    if (File.Exists(path) || Directory.Exists(path)) { ok = true; break; }
                     Thread.Sleep(120);
                 }
 

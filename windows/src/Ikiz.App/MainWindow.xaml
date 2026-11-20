@@ -144,7 +144,7 @@
                                                 FontSize="14.5" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
                         <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
                             <TextBlock Text="{Binding CountText}" Foreground="{DynamicResource Muted2Brush}" FontSize="12"/>
-                            <TextBlock Text=" · her biri " Foreground="{DynamicResource Muted2Brush}" FontSize="12"/>
+                            <TextBlock Text="{Binding MetaSeparator}" Foreground="{DynamicResource Muted2Brush}" FontSize="12"/>
                             <TextBlock Text="{Binding SizeText}" Foreground="{DynamicResource Muted2Brush}" FontSize="12"/>
                             <TextBlock Text=" · " Foreground="{DynamicResource Muted2Brush}" FontSize="12"/>
                             <TextBlock Text="{Binding PathHint}" Foreground="{DynamicResource Muted2Brush}"
@@ -155,7 +155,7 @@
                     <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,12,0">
                         <TextBlock Text="{Binding WasteText}" Foreground="{DynamicResource AccentStrongBrush}"
                                    FontWeight="SemiBold" FontSize="12.5"/>
-                        <TextBlock Text=" kazanılabilir" Foreground="{DynamicResource Muted2Brush}"
+                        <TextBlock Text="{Binding WasteLabel}" Foreground="{DynamicResource Muted2Brush}"
                                    FontSize="12" VerticalAlignment="Bottom" Margin="0,0,0,1"/>
                     </StackPanel>
 
@@ -632,6 +632,10 @@
                           Margin="0,0,14,0" VerticalAlignment="Center"/>
                 <CheckBox Style="{StaticResource Switch}" Content="Yalnızca çiftler" IsChecked="{Binding OnlyDuplicates, Mode=TwoWay}"
                           Margin="0,0,14,0" VerticalAlignment="Center"/>
+                <CheckBox Style="{StaticResource Switch}" Content="Boş klasör ve 0 KB" IsChecked="{Binding OnlyEmptyItems, Mode=TwoWay}"
+                          Margin="0,0,14,0" VerticalAlignment="Center"
+                          AutomationProperties.Name="Boş klasör ve 0 KB"
+                          ToolTip="Boş klasörleri ve 0 KB boyutundaki dosyaları listele"/>
                 <CheckBox Style="{StaticResource Switch}" Content="Yol da arama" IsChecked="{Binding SearchPath, Mode=TwoWay}"
                           Margin="0,0,14,0" VerticalAlignment="Center" ToolTip="Kapalıyken yalnızca dosya adında arar"/>
                 <CheckBox Style="{StaticResource Switch}" Content="Panodakileri gizle" IsChecked="{Binding HideStaged, Mode=TwoWay}"
@@ -694,6 +698,11 @@
                                     <Button Style="{StaticResource LinkButton}" Click="OnPickCopiesClick" FontSize="11.5"
                                             AutomationProperties.Name="Kopyaları seç" ToolTip="Her gruptan bir kopya korunur, fazlalıklar seçilir">
                                         <TextBlock Text="Kopyaları seç" Foreground="{DynamicResource AccentBrush}"/>
+                                    </Button>
+                                    <TextBlock Text="·" Foreground="{DynamicResource Muted2Brush}" Margin="6,0" VerticalAlignment="Center"/>
+                                    <Button Style="{StaticResource LinkButton}" Click="OnPickEmptyItemsClick" FontSize="11.5"
+                                            AutomationProperties.Name="Boş ve 0 KB seç" ToolTip="Boş klasörleri ve 0 KB dosyaları göster ve tümünü seç">
+                                        <TextBlock Text="Boş / 0 KB seç" Foreground="{DynamicResource AccentBrush}"/>
                                     </Button>
                                     <StackPanel Orientation="Horizontal" Visibility="{Binding HasPicked, Converter={StaticResource BoolVis}}">
                                         <TextBlock Text="·" Foreground="{DynamicResource Muted2Brush}" Margin="6,0" VerticalAlignment="Center"/>

@@ -64,9 +64,9 @@ public static class FileDeleter
         long freed = 0;
 
         var alive = new List<FileItem>();
-        foreach (var item in items)
+        foreach (var item in items.OrderBy(i => i.IsDirectory).ThenByDescending(i => i.FullPath.Length))
         {
-            if (!IsSafeToDelete(item.FullPath, out var reason))
+            if (!IsSafeToDelete(item.FullPath, item.IsDirectory, out var reason))
             {
                 failed.Add((item.FullPath, reason));
                 continue;
@@ -76,7 +76,7 @@ public static class FileDeleter
 
         if (alive.Count == 0) return new DeleteOutcome(deleted, failed, 0);
 
-        var from = string.Join("\0", alive.Select(i => i.FullPath)) + "\0\0";
+        var from = string.Join("\0", alive.Select(i => i.FullPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar))) + "\0\0";
         var op = new ShFileOpStruct
         {
             wFunc = FoDelete,
@@ -94,8 +94,9 @@ public static class FileDeleter
 
         foreach (var item in alive)
         {
-            if (File.Exists(item.FullPath))
-                failed.Add((item.FullPath, op.fAnyOperationsAborted ? "İşlem iptal edildi" : "Dosya taşınamadı"));
+            var stillExists = item.IsDirectory ? Directory.Exists(item.FullPath) : File.Exists(item.FullPath);
+            if (stillExists)
+                failed.Add((item.FullPath, op.fAnyOperationsAborted ? "İşlem iptal edildi" : "Öğe taşınamadı"));
             else
             {
                 deleted.Add(item.FullPath);
@@ -112,9 +113,9 @@ public static class FileDeleter
         var failed = new List<(string, string)>();
         long freed = 0;
 
-        foreach (var item in items)
+        foreach (var item in items.OrderBy(i => i.IsDirectory).ThenByDescending(i => i.FullPath.Length))
         {
-            if (!IsSafeToDelete(item.FullPath, out var reason))
+            if (!IsSafeToDelete(item.FullPath, item.IsDirectory, out var reason))
             {
                 failed.Add((item.FullPath, reason));
                 continue;
@@ -122,7 +123,11 @@ public static class FileDeleter
 
             try
             {
-                File.Delete(item.FullPath);
+                if (item.IsDirectory)
+                    Directory.Delete(item.FullPath, recursive: false);
+                else
+                    File.Delete(item.FullPath);
+
                 deleted.Add(item.FullPath);
                 freed += item.Size;
             }
@@ -136,6 +141,9 @@ public static class FileDeleter
     }
 
     public static bool IsSafeToDelete(string? path, out string reason)
+        => IsSafeToDelete(path, isDirectory: false, out reason);
+
+    public static bool IsSafeToDelete(string? path, bool isDirectory, out string reason)
     {
         if (string.IsNullOrWhiteSpace(path))
         {
@@ -146,6 +154,45 @@ public static class FileDeleter
         try
         {
             var full = Path.GetFullPath(path);
+            if (isDirectory)
+            {
+                if (!Directory.Exists(full))
+                {
+                    reason = "Klasör bulunamadı";
+                    return false;
+                }
+
+                var root = Path.GetPathRoot(full);
+                if (!string.IsNullOrEmpty(root) &&
+                    string.Equals(full.TrimEnd(Path.DirectorySeparatorChar), root.TrimEnd(Path.DirectorySeparatorChar), StringComparison.OrdinalIgnoreCase))
+                {
+                    reason = "Sürücü kökü silinemez";
+                    return false;
+                }
+
+                var dirAttrs = File.GetAttributes(full);
+                if ((dirAttrs & FileAttributes.ReparsePoint) != 0)
+                {
+                    reason = "Sembolik bağlantılar güvenlik nedeniyle silinmez";
+                    return false;
+                }
+
+                if ((dirAttrs & (FileAttributes.System | FileAttributes.Hidden)) != 0)
+                {
+                    reason = "Sistem veya gizli klasörler silinmez";
+                    return false;
+                }
+
+                if (Directory.EnumerateFileSystemEntries(full).Any())
+                {
+                    reason = "Klasör boş değil";
+                    return false;
+                }
+
+                reason = "";
+                return true;
+            }
+
             if (!File.Exists(full))
             {
                 reason = "Dosya bulunamadı";
@@ -155,7 +202,7 @@ public static class FileDeleter
             var attrs = File.GetAttributes(full);
             if ((attrs & FileAttributes.Directory) != 0)
             {
-                reason = "Klasörler silinemez";
+                reason = "Klasörler dosya olarak silinemez";
                 return false;
             }
 

@@ -10,6 +10,7 @@ public sealed class SearchRequest
     public string Type { get; init; } = "all";
     public string Sort { get; init; } = "waste";
     public bool OnlyDuplicates { get; init; } = true;
+    public bool OnlyEmptyItems { get; init; }
     public bool GroupMode { get; init; } = true;
     /// <summary>Silme panosunda bekleyen dosyaların arama sonuçlarından çıkarılması.</summary>
     public IReadOnlySet<int>? HiddenIds { get; init; }
@@ -33,10 +34,19 @@ public sealed class SearchResult
     public required int DuplicateFileCount { get; init; }
     public required long TotalWaste { get; init; }
     public required bool Truncated { get; init; }
+    public int EmptyFolderCount { get; init; }
+    public int ZeroByteFileCount { get; init; }
 }
 
 public sealed class FileIndex
 {
+    public const string EmptyFoldersGroupKey = "__empty_folders__";
+    public const string ZeroFilesGroupKey = "__zero_files__";
+
+    public static bool IsEmptyGroupKey(string? key) =>
+        string.Equals(key, EmptyFoldersGroupKey, StringComparison.Ordinal) ||
+        string.Equals(key, ZeroFilesGroupKey, StringComparison.Ordinal);
+
     private static readonly StringComparer TrComparer =
         StringComparer.Create(CultureInfo.GetCultureInfo("tr-TR"), true);
 
@@ -45,8 +55,11 @@ public sealed class FileIndex
     private readonly ConcurrentDictionary<int, byte> _removed = new();
     private int _nextId;
 
-    public int TotalCount => _snapshot.Length;
-    public int AliveCount => _snapshot.Length - _removed.Count;
+    public int TotalCount => _snapshot.Count(f => !f.IsDirectory);
+    public int AliveCount => _snapshot.Count(f => !f.IsDirectory && !_removed.ContainsKey(f.Id));
+    public int AliveEmptyFolderCount => _snapshot.Count(f => f.IsDirectory && !_removed.ContainsKey(f.Id));
+    public int AliveZeroByteFileCount => _snapshot.Count(f => !f.IsDirectory && f.Size == 0 && !_removed.ContainsKey(f.Id));
+    public int AliveEmptyItemCount => AliveEmptyFolderCount + AliveZeroByteFileCount;
 
     /// <summary>Gizlilik denetimi gibi salt okuma gereksinimleri için anlık dosya listesi.</summary>
     public IReadOnlyList<FileItem> Snapshot => _snapshot;
@@ -67,6 +80,7 @@ public sealed class FileIndex
                 Extension = c.Extension,
                 Size = c.Size,
                 ModifiedUtc = c.ModifiedUtc,
+                IsDirectory = c.IsDirectory,
             };
             items[i] = item;
             if (!byKey.TryGetValue(item.DuplicateKey, out var list))
@@ -81,6 +95,24 @@ public sealed class FileIndex
 
     public IReadOnlyList<FileItem> GetByKey(string key)
     {
+        if (string.Equals(key, EmptyFoldersGroupKey, StringComparison.Ordinal))
+        {
+            return _snapshot
+                .Where(f => f.IsDirectory && !_removed.ContainsKey(f.Id))
+                .OrderBy(f => f.Directory, StringComparer.OrdinalIgnoreCase)
+                .ThenBy(f => f.FullPath, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+        }
+
+        if (string.Equals(key, ZeroFilesGroupKey, StringComparison.Ordinal))
+        {
+            return _snapshot
+                .Where(f => !f.IsDirectory && f.Size == 0 && !_removed.ContainsKey(f.Id))
+                .OrderBy(f => f.Directory, StringComparer.OrdinalIgnoreCase)
+                .ThenBy(f => f.FullPath, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+        }
+
         if (!_byKey.TryGetValue(key, out var list)) return Array.Empty<FileItem>();
         return list
             .Where(f => !_removed.ContainsKey(f.Id))
@@ -91,6 +123,10 @@ public sealed class FileIndex
 
     public int AliveCountForKey(string key)
     {
+        if (string.Equals(key, EmptyFoldersGroupKey, StringComparison.Ordinal))
+            return AliveEmptyFolderCount;
+        if (string.Equals(key, ZeroFilesGroupKey, StringComparison.Ordinal))
+            return AliveZeroByteFileCount;
         if (!_byKey.TryGetValue(key, out var list)) return 0;
         return list.Count(f => !_removed.ContainsKey(f.Id));
     }
@@ -160,6 +196,7 @@ public sealed class FileIndex
                 Extension = file.Extension,
                 Size = file.Size,
                 ModifiedUtc = file.ModifiedUtc,
+                IsDirectory = file.IsDirectory,
             });
             added = true;
         }
@@ -188,11 +225,13 @@ public sealed class FileIndex
         var items = _snapshot;
         var tokens = TextNormalizer.Tokenize(request.Text);
         var allTypes = string.Equals(request.Type, "all", StringComparison.OrdinalIgnoreCase);
-        var needGroups = request.GroupMode || request.OnlyDuplicates;
+        var needGroups = !request.OnlyEmptyItems && (request.GroupMode || request.OnlyDuplicates);
 
         var matched = new List<FileItem>(Math.Min(items.Length, 4096));
         var typeCounts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         Dictionary<string, List<FileItem>>? byKey = null;
+        var emptyFolderCount = 0;
+        var zeroByteFileCount = 0;
 
         for (var i = 0; i < items.Length; i++)
         {
@@ -200,6 +239,15 @@ public sealed class FileIndex
             var f = items[i];
             if (_removed.ContainsKey(f.Id)) continue;
             if (request.HiddenIds?.Contains(f.Id) == true) continue;
+
+            if (request.OnlyEmptyItems)
+            {
+                if (!f.IsEmptyItem) continue;
+            }
+            else
+            {
+                if (f.IsDirectory) continue;
+            }
 
             if (tokens.Length > 0)
             {
@@ -219,12 +267,49 @@ public sealed class FileIndex
                 continue;
 
             matched.Add(f);
+            if (f.IsDirectory) emptyFolderCount++;
+            else if (f.Size == 0) zeroByteFileCount++;
+
             if (!needGroups) continue;
 
             byKey ??= new Dictionary<string, List<FileItem>>(StringComparer.Ordinal);
             if (!byKey.TryGetValue(f.DuplicateKey, out var list))
                 byKey[f.DuplicateKey] = list = new List<FileItem>(2);
             list.Add(f);
+        }
+
+        if (request.OnlyEmptyItems)
+        {
+            var emptyGroups = new List<DuplicateGroup>(2);
+            var emptyDirs = matched.Where(f => f.IsDirectory)
+                .OrderBy(f => f.FullPath, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+            if (emptyDirs.Count > 0)
+                emptyGroups.Add(new DuplicateGroup(EmptyFoldersGroupKey, "Boş klasörler", FolderScanner.FolderExtension, 0, emptyDirs));
+
+            var zeroFiles = matched.Where(f => !f.IsDirectory && f.Size == 0)
+                .OrderBy(f => f.FullPath, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+            if (zeroFiles.Count > 0)
+                emptyGroups.Add(new DuplicateGroup(ZeroFilesGroupKey, "0 KB dosyalar", "0kb", 0, zeroFiles));
+
+            var emptyFlat = request.GroupMode
+                ? new List<FileItem>()
+                : SortFiles(matched, request.Sort).Take(request.MaxFiles).ToList();
+
+            return new SearchResult
+            {
+                Groups = emptyGroups,
+                Files = emptyFlat,
+                TypeCounts = typeCounts,
+                MatchedCount = matched.Count,
+                DuplicateGroupCount = emptyGroups.Count,
+                DuplicateFileCount = matched.Count,
+                TotalWaste = 0,
+                Truncated = !request.GroupMode && matched.Count > request.MaxFiles,
+                EmptyFolderCount = emptyFolderCount,
+                ZeroByteFileCount = zeroByteFileCount,
+            };
         }
 
         var groups = new List<DuplicateGroup>();
@@ -274,6 +359,8 @@ public sealed class FileIndex
             DuplicateFileCount = duplicateFileCount,
             TotalWaste = waste,
             Truncated = truncated,
+            EmptyFolderCount = emptyFolderCount,
+            ZeroByteFileCount = zeroByteFileCount,
         };
     }
 

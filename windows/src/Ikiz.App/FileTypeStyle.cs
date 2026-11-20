@@ -32,6 +32,8 @@ public static class FileTypeStyle
         ["msi"] = "#A3E635",
         ["json"] = "#FDE68A",
         ["csv"] = "#34D399",
+        ["klasör"] = "#38BDF8",
+        ["0kb"] = "#FB923C",
     };
 
     private static readonly string[] Palette =

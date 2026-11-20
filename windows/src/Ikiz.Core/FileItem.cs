@@ -15,15 +15,20 @@ public sealed class FileItem
     public string Extension { get; init; } = "";
     public long Size { get; init; }
     public DateTime ModifiedUtc { get; init; }
+    public bool IsDirectory { get; init; }
+
+    public bool IsZeroByteFile => !IsDirectory && Size == 0;
+    public bool IsEmptyItem => IsDirectory || Size == 0;
 
     public string FoldedName => _foldedName ??= TextNormalizer.Fold(Name);
     public string FoldedPath => _foldedPath ??= TextNormalizer.Fold(FullPath);
 
-    public string DuplicateKey => _key ??=
-        $"{FoldedName}\u001f{Size.ToString(CultureInfo.InvariantCulture)}\u001f{Extension}";
+    public string DuplicateKey => _key ??= IsDirectory
+        ? $"dir\u001f{FoldedPath}"
+        : $"{FoldedName}\u001f{Size.ToString(CultureInfo.InvariantCulture)}\u001f{Extension}";
 
-    public string SizeText => HumanSize.Format(Size);
-    public string ExtLabel => string.IsNullOrEmpty(Extension) ? "DOS" : Extension.ToUpperInvariant();
+    public string SizeText => IsDirectory ? "Boş klasör" : HumanSize.Format(Size);
+    public string ExtLabel => IsDirectory ? "KLS" : (string.IsNullOrEmpty(Extension) ? "DOS" : Extension.ToUpperInvariant());
 }
 
 public sealed record FileCandidate(
@@ -32,4 +37,5 @@ public sealed record FileCandidate(
     string Directory,
     string Extension,
     long Size,
-    DateTime ModifiedUtc);
+    DateTime ModifiedUtc,
+    bool IsDirectory = false);

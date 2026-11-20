@@ -26,10 +26,18 @@ public sealed class GroupHeaderVm : ResultRowVm
     public required long Waste { get; init; }
     public required string PathHint { get; init; }
     public required bool Expanded { get; init; }
+    public bool IsEmptyGroup { get; init; }
 
-    public string CountText => $"{Count} kopya";
-    public string SizeText => HumanSize.Format(Size);
-    public string WasteText => HumanSize.Format(Waste);
+    public string CountText => Key switch
+    {
+        FileIndex.EmptyFoldersGroupKey => $"{Count} boş klasör",
+        FileIndex.ZeroFilesGroupKey => $"{Count} sıfır KB dosya",
+        _ => $"{Count} kopya",
+    };
+    public string MetaSeparator => IsEmptyGroup ? "" : " · her biri ";
+    public string SizeText => IsEmptyGroup ? "" : HumanSize.Format(Size);
+    public string WasteText => IsEmptyGroup ? $"{Count} öğe" : HumanSize.Format(Waste);
+    public string WasteLabel => IsEmptyGroup ? " temizlenebilir" : " kazanılabilir";
     public string ChevronGlyph => Expanded ? "\uE70D" : "\uE76C";
     public string ExpandTitle => Expanded ? "Grubu daralt" : "Grubu genişlet";
 }

@@ -10,7 +10,7 @@
     <ApplicationIcon>Assets\ikiz.ico</ApplicationIcon>
     <AssemblyName>Ikiz.App</AssemblyName>
     <RootNamespace>Ikiz.App</RootNamespace>
-    <Version>1.2.2</Version>
+    <Version>1.3.0</Version>
     <Authors>Ikiz contributors</Authors>
     <Product>İkiz</Product>
     <Description>Windows için hızlı dosya arama ve çift kopya temizleyici.</Description>

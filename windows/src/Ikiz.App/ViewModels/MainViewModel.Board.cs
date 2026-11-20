@@ -133,7 +133,8 @@ public sealed partial class MainViewModel
     {
         var files = _index.GetByKey(key);
         if (files.Count == 0) return;
-        _board.Stage(files, keepFirstIfNew: true);
+        var keepFirst = !OnlyEmptyItems && !FileIndex.IsEmptyGroupKey(key);
+        _board.Stage(files, keepFirstIfNew: keepFirst);
         ResetApproval();
         RefreshBoard();
         RefreshBoardTotals();
@@ -147,7 +148,8 @@ public sealed partial class MainViewModel
         foreach (var group in _lastResult.Groups)
         {
             var files = _index.GetByKey(group.Key);
-            if (files.Count > 0) _board.Stage(files, keepFirstIfNew: true);
+            var keepFirst = !OnlyEmptyItems && !FileIndex.IsEmptyGroupKey(group.Key);
+            if (files.Count > 0) _board.Stage(files, keepFirstIfNew: keepFirst);
         }
 
         ResetApproval();
@@ -241,10 +243,15 @@ public sealed partial class MainViewModel
         var comparer = StringComparer.Create(CultureInfo.GetCultureInfo("tr-TR"), true);
 
         foreach (var grouping in _board.Items
-                     .GroupBy(f => f.DuplicateKey)
+                     .GroupBy(f => f.IsDirectory
+                         ? FileIndex.EmptyFoldersGroupKey
+                         : f.Size == 0 && _index.AliveCountForKey(f.DuplicateKey) <= 1
+                             ? FileIndex.ZeroFilesGroupKey
+                             : f.DuplicateKey)
                      .OrderBy(g => g.First().Name, comparer))
         {
             var key = grouping.Key;
+            var isEmptyGroup = FileIndex.IsEmptyGroupKey(key);
             var alive = _index.GetByKey(key);
             var aliveCount = alive.Count;
             var rows = grouping
@@ -262,19 +269,34 @@ public sealed partial class MainViewModel
 
             var selectedInBoard = rows.Count(r => r.IsSelected);
             var first = rows[0].File;
+            var groupName = key == FileIndex.EmptyFoldersGroupKey
+                ? "Boş klasörler"
+                : key == FileIndex.ZeroFilesGroupKey
+                    ? "0 KB dosyalar"
+                    : first.Name;
+            var extLabel = key == FileIndex.EmptyFoldersGroupKey
+                ? "KLS"
+                : key == FileIndex.ZeroFilesGroupKey
+                    ? "0KB"
+                    : first.ExtLabel;
+            var colorKey = key == FileIndex.EmptyFoldersGroupKey
+                ? FolderScanner.FolderExtension
+                : key == FileIndex.ZeroFilesGroupKey
+                    ? "0kb"
+                    : first.Extension;
             var group = new BoardGroupVm
             {
                 Key = key,
-                Name = first.Name,
-                ExtLabel = first.ExtLabel,
-                Color = FileTypeStyle.Color(first.Extension),
-                AliveCount = aliveCount,
+                Name = groupName,
+                ExtLabel = extLabel,
+                Color = FileTypeStyle.Color(colorKey),
+                AliveCount = isEmptyGroup ? 1 : aliveCount,
                 InBoard = rows.Count,
                 Meta = $"{rows.Count}/{aliveCount} panoda",
-                CanKeepOne = aliveCount > 1,
+                CanKeepOne = !isEmptyGroup && aliveCount > 1,
                 Rows = rows,
             };
-            group.AllSelected = aliveCount > 0 && selectedInBoard >= aliveCount;
+            group.AllSelected = !isEmptyGroup && aliveCount > 0 && selectedInBoard >= aliveCount;
             BoardGroups.Add(group);
         }
 
@@ -299,6 +321,11 @@ public sealed partial class MainViewModel
         var fullGroups = 0;
         foreach (var group in BoardGroups)
         {
+            if (FileIndex.IsEmptyGroupKey(group.Key))
+            {
+                group.AllSelected = false;
+                continue;
+            }
             var alive = _index.AliveCountForKey(group.Key);
             var selectedInGroup = group.Rows.Count(r => r.IsSelected);
             group.AllSelected = alive > 0 && selectedInGroup >= alive;
