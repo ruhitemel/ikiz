@@ -88,6 +88,19 @@
             <Border Style="{StaticResource GroupHeaderRoot}" Cursor="Hand" MouseLeftButtonUp="OnGroupHeaderClick">
                 <Border.ContextMenu>
                     <ContextMenu Opened="OnGroupMenuOpened">
+                        <MenuItem Tag="openLocation" Header="Dosya konumunu aç (Klasörde göster)" Click="OnMenuOpenGroupLocationClick">
+                            <MenuItem.Icon>
+                                <Path Data="{StaticResource GeoFolder}" Stroke="{DynamicResource AccentStrongBrush}"
+                                      StrokeThickness="1.4" Stretch="Uniform" StrokeLineJoin="Round"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Tag="compare" Header="Karşılaştır… (SHA-256 içerik doğrulama)" Click="OnMenuCompareGroupClick">
+                            <MenuItem.Icon>
+                                <Path Data="{StaticResource GeoShield}" Stroke="{DynamicResource AccentStrongBrush}"
+                                      StrokeThickness="1.4" Stretch="Uniform" StrokeLineJoin="Round"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <Separator/>
                         <MenuItem Tag="stage" Header="Tüm kopyaları panoya al" Click="OnMenuStageGroupClick">
                             <MenuItem.Icon>
                                 <Path Data="{StaticResource GeoClipboardPlus}" Stroke="{DynamicResource MutedBrush}"
@@ -178,6 +191,20 @@
                     MouseEnter="OnFileRowMouseEnter">
                 <Border.ContextMenu>
                     <ContextMenu Opened="OnFileMenuOpened">
+                        <MenuItem Tag="openLocation" Header="Dosya konumunu aç (Klasörde göster)" Click="OnMenuOpenLocationClick">
+                            <MenuItem.Icon>
+                                <Path Data="{StaticResource GeoFolder}" Stroke="{DynamicResource AccentStrongBrush}"
+                                      StrokeThickness="1.4" Stretch="Uniform" StrokeLineJoin="Round"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Tag="openFolder" Header="Kayıtlı olduğu klasörü aç" Click="OnMenuOpenFolderClick"/>
+                        <MenuItem Tag="compare" Header="Karşılaştır… (SHA-256 içerik doğrulama)" Click="OnMenuCompareClick">
+                            <MenuItem.Icon>
+                                <Path Data="{StaticResource GeoShield}" Stroke="{DynamicResource AccentStrongBrush}"
+                                      StrokeThickness="1.4" Stretch="Uniform" StrokeLineJoin="Round"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <Separator/>
                         <MenuItem Tag="stage" Header="Panoya ekle" Click="OnMenuStageClick">
                             <MenuItem.Icon>
                                 <Path Data="{StaticResource GeoClipboardPlus}" Stroke="{DynamicResource MutedBrush}"
@@ -566,7 +593,7 @@
                                  Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
                                  AutomationProperties.Name="Dosya ara"
                                  VerticalAlignment="Center"/>
-                        <TextBlock Text="dosya adı, uzantı veya yol ara…  örn. fatura"
+                        <TextBlock Text="{Binding SearchPlaceholderText}"
                                    Foreground="{DynamicResource Muted2Brush}" FontSize="16" VerticalAlignment="Center"
                                    IsHitTestVisible="False" Margin="2,0,0,0"
                                    Visibility="{Binding SearchText, Converter={StaticResource EmptyVis}}"/>
@@ -624,20 +651,33 @@
             </ListBox>
 
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                <Border Background="{DynamicResource Panel3Brush}" CornerRadius="9" Padding="3" Margin="0,0,14,0"
+                        BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal">
+                        <RadioButton Style="{StaticResource ThemeSegment}" GroupName="maintab"
+                                     IsChecked="{Binding IsDuplicatesTab, Mode=TwoWay}"
+                                     AutomationProperties.Name="Çift Kopyalar sekmesi"
+                                     ToolTip="Aynı ad, boyut ve türdeki çift kopyaları grupla">
+                            <TextBlock Text="Çift Kopyalar" Margin="4,1"/>
+                        </RadioButton>
+                        <RadioButton Style="{StaticResource ThemeSegment}" GroupName="maintab"
+                                     IsChecked="{Binding IsFastSearchTab, Mode=TwoWay}"
+                                     AutomationProperties.Name="Hızlı Dosya Arama sekmesi"
+                                     ToolTip="Tüm dosyalar içinde hem dosya adında hem klasör yolunda hızlı ara">
+                            <TextBlock Text="Hızlı Dosya Arama" Margin="4,1"/>
+                        </RadioButton>
+                        <RadioButton Style="{StaticResource ThemeSegment}" GroupName="maintab"
+                                     IsChecked="{Binding IsEmptyItemsTab, Mode=TwoWay}"
+                                     AutomationProperties.Name="Boş Klasör ve 0 KB sekmesi"
+                                     ToolTip="İçeriksiz boş klasörleri ve 0 KB dosyaları listele">
+                            <TextBlock Text="Boş Klasör ve 0 KB" Margin="4,1"/>
+                        </RadioButton>
+                    </StackPanel>
+                </Border>
                 <TextBlock Text="Sırala" Foreground="{DynamicResource Muted2Brush}" FontSize="11.5"
                            VerticalAlignment="Center" Margin="0,0,7,0"/>
-                <ComboBox Style="{StaticResource DarkCombo}" Width="162" ItemsSource="{Binding SortOptions}"
-                          SelectedItem="{Binding SelectedSort, Mode=TwoWay}" Margin="0,0,16,0"/>
-                <CheckBox Style="{StaticResource Switch}" Content="Çiftleri grupla" IsChecked="{Binding GroupMode, Mode=TwoWay}"
-                          Margin="0,0,14,0" VerticalAlignment="Center"/>
-                <CheckBox Style="{StaticResource Switch}" Content="Yalnızca çiftler" IsChecked="{Binding OnlyDuplicates, Mode=TwoWay}"
-                          Margin="0,0,14,0" VerticalAlignment="Center"/>
-                <CheckBox Style="{StaticResource Switch}" Content="Boş klasör ve 0 KB" IsChecked="{Binding OnlyEmptyItems, Mode=TwoWay}"
-                          Margin="0,0,14,0" VerticalAlignment="Center"
-                          AutomationProperties.Name="Boş klasör ve 0 KB"
-                          ToolTip="Boş klasörleri ve 0 KB boyutundaki dosyaları listele"/>
-                <CheckBox Style="{StaticResource Switch}" Content="Yol da arama" IsChecked="{Binding SearchPath, Mode=TwoWay}"
-                          Margin="0,0,14,0" VerticalAlignment="Center" ToolTip="Kapalıyken yalnızca dosya adında arar"/>
+                <ComboBox Style="{StaticResource DarkCombo}" Width="156" ItemsSource="{Binding SortOptions}"
+                          SelectedItem="{Binding SelectedSort, Mode=TwoWay}" Margin="0,0,14,0"/>
                 <CheckBox Style="{StaticResource Switch}" Content="Panodakileri gizle" IsChecked="{Binding HideStaged, Mode=TwoWay}"
                           VerticalAlignment="Center" AutomationProperties.Name="Panodakileri gizle"
                           ToolTip="Panoya alınan dosyalar sonuçlardan çıkar; panodan çıkarınca geri gelir"/>
@@ -716,6 +756,11 @@
                                            Foreground="{DynamicResource Muted2Brush}" VerticalAlignment="Center" Margin="12,0,0,0"/>
                                 <StackPanel Grid.Column="2" Orientation="Horizontal"
                                             Visibility="{Binding HasPicked, Converter={StaticResource BoolVis}}">
+                                    <Button Style="{StaticResource GhostButton}" Click="OnComparePickedClick" Height="28" Padding="9,0"
+                                            IsEnabled="{Binding HasPicked}" Margin="0,0,6,0"
+                                            AutomationProperties.Name="Seçilenleri karşılaştır" ToolTip="Seçili dosyaların SHA-256 içeriklerini, boyutlarını ve tarihlerini karşılaştır">
+                                        <TextBlock Text="Karşılaştır" FontSize="11.5"/>
+                                    </Button>
                                     <Button Style="{StaticResource GhostButton}" Click="OnStagePickedClick" Height="28" Padding="9,0"
                                             IsEnabled="{Binding HasPicked}" Margin="0,0,6,0"
                                             AutomationProperties.Name="Seçilenleri panoya al" ToolTip="Seçili dosyaları silme panosuna aktar">
@@ -1775,6 +1820,218 @@
                                         Margin="0,0,8,0" AutomationProperties.Name="Denetim penceresini kapat"/>
                                 <Button Style="{StaticResource PrimaryButton}" Content="Özeti kopyala"
                                         Click="OnCopyPrivacyClick" AutomationProperties.Name="Denetim özetini kopyala"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- Seçilen dosyaları karşılaştırma ekranı -->
+        <Grid Grid.RowSpan="6" Panel.ZIndex="45"
+              Visibility="{Binding CompareOpen, Converter={StaticResource BoolVis}}">
+            <Border Background="{DynamicResource ScrimBrush}" MouseLeftButtonDown="OnCompareScrimClick"/>
+            <Border Width="820" MaxHeight="720" Background="{DynamicResource PanelBrush}"
+                    BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" CornerRadius="16"
+                    HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="34" ShadowDepth="0" Opacity="0.6" Color="#000000"/>
+                </Border.Effect>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Padding="16,13" BorderBrush="{DynamicResource LineSoftBrush}" BorderThickness="0,0,0,1">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Width="34" Height="34" CornerRadius="9" Background="{DynamicResource AccentSoftBrush}"
+                                    Margin="0,0,11,0">
+                                <Path Data="{StaticResource GeoShield}" Stroke="{DynamicResource AccentStrongBrush}"
+                                      StrokeThickness="1.5" Width="15" Height="15" Stretch="Uniform"
+                                      StrokeLineJoin="Round"/>
+                            </Border>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding CompareTitle}" FontSize="15" FontWeight="SemiBold"/>
+                                <TextBlock Text="SHA-256 içerik parmak izi, tam bayt boyutu, tarih ve klasör doğrulaması"
+                                           FontSize="11.5" Foreground="{DynamicResource Muted2Brush}" Margin="0,1,0,0"/>
+                            </StackPanel>
+                            <Button Grid.Column="2" Style="{StaticResource IconButton}" Click="OnCloseCompareClick"
+                                    AutomationProperties.Name="Karşılaştırmayı kapat" ToolTip="Kapat">
+                                <Path Data="{StaticResource GeoClose}" Stroke="{DynamicResource MutedBrush}"
+                                      StrokeThickness="1.5" Width="11" Height="11" Stretch="Uniform"/>
+                            </Button>
+                        </Grid>
+                    </Border>
+
+                    <ScrollViewer Grid.Row="1" Padding="16,14" VerticalScrollBarVisibility="Auto">
+                        <StackPanel>
+                            <!-- SHA-256 Eşleşme sonucu (Birebir aynı) -->
+                            <Border Background="{DynamicResource InfoSurfaceBrush}" BorderBrush="{DynamicResource InfoBorderBrush}"
+                                    BorderThickness="1" CornerRadius="10" Padding="12,10"
+                                    Visibility="{Binding CompareAllIdentical, Converter={StaticResource BoolVis}}">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding CompareVerdictTitle}" FontSize="13.5" FontWeight="SemiBold"
+                                               Foreground="{DynamicResource InfoStrongBrush}"/>
+                                    <TextBlock Text="{Binding CompareVerdictDetail}" FontSize="11.5"
+                                               Foreground="{DynamicResource InfoTextBrush}" TextWrapping="Wrap" Margin="0,3,0,0"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- SHA-256 Eşleşme sonucu (İçerikler farklı) -->
+                            <Border Background="{DynamicResource DangerSurfaceBrush}" BorderBrush="{DynamicResource DangerBorderBrush}"
+                                    BorderThickness="1" CornerRadius="10" Padding="12,10"
+                                    Visibility="{Binding CompareHasDifference, Converter={StaticResource BoolVis}}">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding CompareVerdictTitle}" FontSize="13.5" FontWeight="SemiBold"
+                                               Foreground="{DynamicResource DangerSoftBrush}"/>
+                                    <TextBlock Text="{Binding CompareVerdictDetail}" FontSize="11.5"
+                                               Foreground="{DynamicResource DangerSoftBrush}" TextWrapping="Wrap" Margin="0,3,0,0"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Hızlı koruma / seçim kısayolları -->
+                            <Grid Margin="0,12,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Button Style="{StaticResource GhostButton}" Click="OnCompareKeepOldestClick" Height="28" Padding="10,0"
+                                            Margin="0,0,7,0" AutomationProperties.Name="En eskiyi koru"
+                                            ToolTip="En eski tarihli (asıl) dosyayı korur, diğer kopyaları işlem için seçer">
+                                        <TextBlock Text="En eskiyi koru" FontSize="11.5"/>
+                                    </Button>
+                                    <Button Style="{StaticResource GhostButton}" Click="OnCompareKeepNewestClick" Height="28" Padding="10,0"
+                                            Margin="0,0,7,0" AutomationProperties.Name="En yeniyi koru"
+                                            ToolTip="En yeni tarihli dosyayı korur, diğer kopyaları işlem için seçer">
+                                        <TextBlock Text="En yeniyi koru" FontSize="11.5"/>
+                                    </Button>
+                                    <Button Style="{StaticResource LinkButton}" Click="OnCompareSelectAllClick" FontSize="11.5"
+                                            Margin="4,0,8,0" AutomationProperties.Name="Karşılaştırmada tümünü seç">
+                                        <TextBlock Text="Tümünü seç" Foreground="{DynamicResource AccentBrush}"/>
+                                    </Button>
+                                    <Button Style="{StaticResource LinkButton}" Click="OnCompareSelectNoneClick" FontSize="11.5"
+                                            AutomationProperties.Name="Karşılaştırmada seçimi kaldır">
+                                        <TextBlock Text="Seçimi kaldır"/>
+                                    </Button>
+                                </StackPanel>
+                                <TextBlock Grid.Column="1" Text="{Binding CompareSelectedSummary}" FontSize="11.5"
+                                           Foreground="{DynamicResource Muted2Brush}" HorizontalAlignment="Right"
+                                           VerticalAlignment="Center"/>
+                            </Grid>
+
+                            <!-- Dosya karşılaştırma kartları -->
+                            <ItemsControl ItemsSource="{Binding CompareRows}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type vm:CompareRowVm}">
+                                        <Border Background="{DynamicResource FieldBrush}" BorderBrush="{DynamicResource LineBrush}"
+                                                BorderThickness="1" CornerRadius="10" Padding="12,10" Margin="0,0,0,8">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="30"/>
+                                                    <ColumnDefinition Width="32"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <CheckBox Grid.Column="0" Style="{StaticResource DarkCheck}"
+                                                          IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                                          VerticalAlignment="Top" Margin="0,4,0,0"
+                                                          AutomationProperties.Name="Karşılaştırılan dosyayı seç"/>
+
+                                                <Grid Grid.Column="1" VerticalAlignment="Top" Margin="0,2,0,0">
+                                                    <Border Width="26" Height="26" CornerRadius="7" Background="{Binding Color}" Opacity="0.16"/>
+                                                    <TextBlock Text="{Binding ExtLabel}" Foreground="{Binding Color}" FontSize="8.5"
+                                                               FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Grid>
+
+                                                <StackPanel Grid.Column="2" Margin="8,0,12,0">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Text="{Binding Name}" FontSize="13.5" FontWeight="SemiBold"
+                                                                   TextTrimming="CharacterEllipsis" MaxWidth="360"/>
+                                                        <Border Background="{DynamicResource AccentSoftBrush}" CornerRadius="5"
+                                                                Padding="6,1" Margin="8,0,0,0"
+                                                                Visibility="{Binding HasAgeBadge, Converter={StaticResource BoolVis}}">
+                                                            <TextBlock Text="{Binding AgeBadge}" FontSize="10.5" FontWeight="SemiBold"
+                                                                       Foreground="{DynamicResource AccentStrongBrush}"/>
+                                                        </Border>
+                                                        <Border Background="{DynamicResource Panel2Brush}" CornerRadius="5"
+                                                                Padding="6,1" Margin="6,0,0,0">
+                                                            <TextBlock Text="{Binding ContentGroupLabel}" FontSize="10.5"
+                                                                       Foreground="{DynamicResource MutedBrush}"/>
+                                                        </Border>
+                                                        <Border Background="{DynamicResource KeptBadgeBrush}" CornerRadius="5"
+                                                                Padding="6,1" Margin="6,0,0,0">
+                                                            <TextBlock Text="{Binding StatusBadge}" FontSize="10.5"
+                                                                       Foreground="{DynamicResource InfoStrongBrush}"/>
+                                                        </Border>
+                                                    </StackPanel>
+
+                                                    <TextBlock Text="{Binding DirectoryPath}" FontSize="11.5"
+                                                               Foreground="{DynamicResource Muted2Brush}"
+                                                               TextTrimming="CharacterEllipsis" Margin="0,3,0,0"/>
+
+                                                    <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                                                        <TextBlock Text="{Binding ExactBytesText}" FontSize="11.5"
+                                                                   FontFamily="Cascadia Mono, Consolas"
+                                                                   Foreground="{DynamicResource TextBrush}"/>
+                                                        <TextBlock Text=" · " Foreground="{DynamicResource Muted2Brush}" FontSize="11.5"/>
+                                                        <TextBlock Text="{Binding ModifiedText}" FontSize="11.5"
+                                                                   FontFamily="Cascadia Mono, Consolas"
+                                                                   Foreground="{DynamicResource MutedBrush}"/>
+                                                        <TextBlock Text=" · " Foreground="{DynamicResource Muted2Brush}" FontSize="11.5"/>
+                                                        <TextBlock Text="{Binding ShortHash}" FontSize="11.5"
+                                                                   FontFamily="Cascadia Mono, Consolas"
+                                                                   Foreground="{DynamicResource AccentStrongBrush}"/>
+                                                    </StackPanel>
+
+                                                    <TextBlock Text="{Binding PreviewText}" FontSize="11.5"
+                                                               Foreground="{DynamicResource Muted2Brush}"
+                                                               TextTrimming="CharacterEllipsis" Margin="0,4,0,0"/>
+                                                </StackPanel>
+
+                                                <Button Grid.Column="3" Style="{StaticResource GhostButton}"
+                                                        Tag="{Binding}" Click="OnCompareRowOpenLocationClick"
+                                                        Height="28" Padding="10,0" VerticalAlignment="Center"
+                                                        AutomationProperties.Name="Klasörde göster"
+                                                        ToolTip="Dosyanın kayıtlı olduğu klasörü aç ve dosyayı seç">
+                                                    <TextBlock Text="Klasörde göster" FontSize="11.5"/>
+                                                </Button>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <Border Grid.Row="2" Padding="16,11" Background="{DynamicResource FieldBrush}"
+                            BorderBrush="{DynamicResource LineSoftBrush}" BorderThickness="0,1,0,0"
+                            CornerRadius="0,0,16,16">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="İşaretli olmayan dosyalar korunur; yalnızca işaretli olanlar panoya alınır veya silinir."
+                                       FontSize="11.5" Foreground="{DynamicResource Muted2Brush}"
+                                       VerticalAlignment="Center" TextWrapping="Wrap" Margin="0,0,12,0"/>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                <Button Style="{StaticResource GhostButton}" Content="Kapat" Click="OnCloseCompareClick"
+                                        Margin="0,0,8,0" AutomationProperties.Name="Karşılaştırmayı kapat"/>
+                                <Button Style="{StaticResource GhostButton}" Content="Seçilenleri panoya al"
+                                        Click="OnStageComparedClick" IsEnabled="{Binding CanActOnCompared}"
+                                        Margin="0,0,8,0" AutomationProperties.Name="Karşılaştırılanları panoya al"/>
+                                <Button Style="{StaticResource PrimaryButton}" Content="Seçilenleri sil…"
+                                        Click="OnDeleteComparedClick" IsEnabled="{Binding CanActOnCompared}"
+                                        AutomationProperties.Name="Karşılaştırılanları sil"/>
                             </StackPanel>
                         </Grid>
                     </Border>

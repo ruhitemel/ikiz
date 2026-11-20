@@ -66,6 +66,13 @@ public partial class MainWindow : Window
 
         if (e.Key == Key.Escape)
         {
+            if (_vm.CompareOpen)
+            {
+                _vm.CloseCompare();
+                e.Handled = true;
+                return;
+            }
+
             if (_vm.PrivacyOpen)
             {
                 _vm.ClosePrivacy();
@@ -113,7 +120,7 @@ public partial class MainWindow : Window
             return;
 
         var inTextBox = Keyboard.FocusedElement is TextBox;
-        if (!inTextBox && !_vm.RenameOpen && !_vm.DeleteOpen && !_vm.BoardOpen && !_vm.AboutOpen && !_vm.LocationsOpen && !_vm.PrivacyOpen && _hoverFile is not null)
+        if (!inTextBox && !_vm.CompareOpen && !_vm.RenameOpen && !_vm.DeleteOpen && !_vm.BoardOpen && !_vm.AboutOpen && !_vm.LocationsOpen && !_vm.PrivacyOpen && _hoverFile is not null)
         {
             if (e.Key == Key.F2)
             {
@@ -186,6 +193,8 @@ public partial class MainWindow : Window
     private void OnPickEmptyItemsClick(object sender, RoutedEventArgs e) => _vm.PickEmptyItems();
 
     private void OnClearPicksClick(object sender, RoutedEventArgs e) => _vm.ClearPicks();
+
+    private void OnComparePickedClick(object sender, RoutedEventArgs e) => _vm.OpenCompareForPicked();
 
     private void OnStagePickedClick(object sender, RoutedEventArgs e) => _vm.StagePicked();
 
@@ -318,6 +327,59 @@ public partial class MainWindow : Window
         if (MenuItemByTag(menu, "undo") is { } undo)
             undo.Header = _vm.UndoMenuText;
     }
+
+    private void OnMenuOpenLocationClick(object sender, RoutedEventArgs e)
+    {
+        if (_menuFile is not { } row) return;
+        _vm.OpenFileLocation(row.File);
+    }
+
+    private void OnMenuOpenFolderClick(object sender, RoutedEventArgs e)
+    {
+        if (_menuFile is not { } row) return;
+        _vm.OpenContainingFolder(row.File);
+    }
+
+    private void OnMenuCompareClick(object sender, RoutedEventArgs e)
+    {
+        if (_menuFile is not { } row) return;
+        _vm.OpenCompareForFile(row.File);
+    }
+
+    private void OnMenuOpenGroupLocationClick(object sender, RoutedEventArgs e)
+    {
+        if (_menuGroup is not { } group) return;
+        var first = _vm.FirstFileOfGroup(group.Key);
+        if (first is not null) _vm.OpenFileLocation(first);
+    }
+
+    private void OnMenuCompareGroupClick(object sender, RoutedEventArgs e)
+    {
+        if (_menuGroup is not { } group) return;
+        _vm.OpenCompareForGroup(group.Key);
+    }
+
+    private void OnCompareScrimClick(object sender, MouseButtonEventArgs e) => _vm.CloseCompare();
+
+    private void OnCloseCompareClick(object sender, RoutedEventArgs e) => _vm.CloseCompare();
+
+    private void OnCompareKeepOldestClick(object sender, RoutedEventArgs e) => _vm.CompareKeepOldest();
+
+    private void OnCompareKeepNewestClick(object sender, RoutedEventArgs e) => _vm.CompareKeepNewest();
+
+    private void OnCompareSelectAllClick(object sender, RoutedEventArgs e) => _vm.CompareSelectAll();
+
+    private void OnCompareSelectNoneClick(object sender, RoutedEventArgs e) => _vm.CompareSelectNone();
+
+    private void OnCompareRowOpenLocationClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button { Tag: CompareRowVm row })
+            _vm.OpenFileLocation(row.File);
+    }
+
+    private void OnStageComparedClick(object sender, RoutedEventArgs e) => _vm.StageCompared();
+
+    private void OnDeleteComparedClick(object sender, RoutedEventArgs e) => _vm.DeleteCompared();
 
     private void OnMenuStageClick(object sender, RoutedEventArgs e)
     {

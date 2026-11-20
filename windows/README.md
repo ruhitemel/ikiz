@@ -54,12 +54,19 @@ powershell -ExecutionPolicy Bypass -File demo\olustur.ps1 -Temizle
 ## Kullanım rehberi
 
 1. **Klasör seç** — açılışta Masaüstü, Belgeler, İndirilenler, Resimler, Müzik ve Videolar taranır. Başka bir disk veya klasör eklemek için üstteki **Konum ekle** düğmesine bas. Diskleri işaretleyip **Seçilenleri ekle ve tara** de. Listeden bir kökü kaldırabilir, **Yeniden indeksle** ile her şeyi baştan tarayabilirsin. Tarama sürerken ilerleme çubuğu, dosya sayısı, geçen süre ve kalan süre görünür. Yalnızca belge, resim, ses ve video dosyaları taranır; sistem ve uygulama dosyaları listeye girmez.
-2. **Ara** — arama kutusuna birkaç harf yaz; sonuçlar anında gelir. `İ/I/ı` aynı harf sayılır; `ş/s`, `ğ/g`, `ç/c`, `ö/o`, `ü/u` da öyle. Birden fazla kelime yazarsan ikisinin de olması gerekir. Varsayılan olarak dosya adına bakar; **Yol da arama** açarsan klasör adları da aranır.
-3. **Çiftleri gör** — adı, boyutu ve türü aynı olan dosyalar bir grupta toplanır. "Kazanılabilir alan", gereksiz kopyaların toplam boyutudur.
-4. **Hızlı seç** — her satırın başındaki kutuyu işaretle. Toplu işlem için **Tümünü seç**, **Kopyaları seç** veya **Boş / 0 KB seç** bağlantısını kullan. **Kopyaları seç** her gruptan bir dosyayı bırakır, fazlalıkları işaretler. **Boş / 0 KB seç** boş klasörleri ve 0 KB dosyaları listeler ve tümünü işaretler (filtre çubuğundaki **Boş klasör ve 0 KB** anahtarıyla da açıp kapatabilirsin). Sonra **Panoya al**, **Sil** veya **Adlandır** düğmesine bas. İşlem bitince seçim temizlenir.
+2. **Sekme seç ve ara** — üstteki üç sabit sekmeden birini seç:
+   - **Çift Kopyalar**: aynı ad, boyut ve türdeki kopyaları gruplar.
+   - **Hızlı Dosya Arama**: tüm dosyalar içinde hem dosya adına hem klasör yoluna göre anında arar.
+   - **Boş Klasör ve 0 KB**: içeriksiz boş klasörleri ve 0 KB dosyaları listeler.
+   Arama kutusuna birkaç harf yaz; sonuçlar anında gelir (`İ/I/ı`, `ş/s`, `ğ/g`, `ç/c`, `ö/o`, `ü/u` katlanır).
+3. **Kesin emin olmak için karşılaştır** — dosya veya grup üzerinde sağ tık → **Karşılaştır…** ya da çoklu seçim çubuğundaki **Karşılaştır** düğmesine bas. Dosyaların **SHA-256 içerik parmak izi**, tam bayt boyutu, tarihi ve önizlemesi kontrol edilir; **%100 Birebir Aynı İçerik** olup olmadığı gösterilir. **En eskiyi koru** veya **En yeniyi koru** düğmesiyle tek tıkla seçim yapıp panoya alabilir ya da silebilirsin.
+4. **Hızlı seç** — her satırın başındaki kutuyu işaretle. Toplu işlem için **Tümünü seç**, **Kopyaları seç** veya **Boş / 0 KB seç** bağlantısını kullan. Sonra **Karşılaştır**, **Panoya al**, **Sil** veya **Adlandır** düğmesine bas. İşlem bitince seçim temizlenir.
 5. **Panoyu kontrol et** — **Panoya al** pano listesini kendiliğinden açmaz; üstteki **Panoyu göster** düğmesiyle aç. Panodaki dosyalar bellekte bekler. **Panodakileri gizle** açıkken (varsayılan) bu dosyalar sonuç listesinden çıkar; panodan çıkarınca geri gelir. Panoda tek tek seçebilir, **Tümünü seç**, **Hiçbirini seç** veya **1 koru** diyebilirsin. "×" ile bir satırı çıkarırsın.
 6. **Onay ver ve sil** — "Listeyi kontrol ettim..." kutusunu işaretlemeden silme düğmesi açılmaz. Seçimi değiştirirsen onay sıfırlanır. Varsayılan işlem **Geri Dönüşüm Kutusu'na taşımaktır**; kalıcı silme ayrı ve uyarılı bir seçenektir. Bir grubun tamamı seçilirse kırmızı uyarı görürsün. Son silme işlemi bildirimdeki **Geri al** ile ya da sağ tık → **Son silmeyi geri al** ile döndürülebilir.
-7. **Sağ tık menüsü** — dosya satırında veya grup başlığında sağ tıkla:
+7. **Sağ tık menüsü** — dosya satırında, boş klasörde veya grup başlığında sağ tıkla:
+   - **Dosya konumunu aç (Klasörde göster)** — Windows Gezgini'nde dosyayı veya boş klasörü seçili olarak açar,
+   - **Kayıtlı olduğu klasörü aç** — dosyanın bulunduğu klasörü açar,
+   - **Karşılaştır… (SHA-256 içerik doğrulama)** — kopyaların veya seçili dosyaların birebir aynı içerikte olup olmadığını doğrular,
    - **Panoya ekle / Panodan çıkar** — yalnızca o dosyayı ekler veya çıkarır,
    - **Adı düzenle** — tek dosya, o adın kopyaları, o türdeki dosyalar veya tüm sonuçlar için toplu ad değiştirme; önizleme gösterilir, uzantı korunur,
    - **Sil (yalnızca bu dosya)** — sadece o kopyayı siler,

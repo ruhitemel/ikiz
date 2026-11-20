@@ -55,10 +55,11 @@ public sealed partial class MainViewModel
     /// <summary>Boş klasörleri ve 0 KB dosyaları gösterir ve tümünü toplu işlem için seçer.</summary>
     public void PickEmptyItems()
     {
-        if (!_onlyEmptyItems)
+        if (!_onlyEmptyItems || !_groupMode)
         {
             _onlyEmptyItems = true;
-            Raise(nameof(OnlyEmptyItems));
+            _groupMode = true;
+            RaiseTabState();
         }
 
         var result = _index.Search(BuildRequest());
@@ -131,5 +132,6 @@ public sealed partial class MainViewModel
         Raise(nameof(PickedCount));
         Raise(nameof(HasPicked));
         Raise(nameof(PickedText));
+        Raise(nameof(CanComparePicked));
     }
 }

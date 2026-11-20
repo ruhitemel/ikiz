@@ -67,7 +67,9 @@ public sealed partial class MainViewModel : BindableBase
         get => _onlyDuplicates;
         set
         {
-            if (Set(ref _onlyDuplicates, value)) TriggerSearch();
+            if (!Set(ref _onlyDuplicates, value)) return;
+            RaiseTabState();
+            TriggerSearch();
         }
     }
 
@@ -78,9 +80,75 @@ public sealed partial class MainViewModel : BindableBase
         set
         {
             if (!Set(ref _onlyEmptyItems, value)) return;
+            RaiseTabState();
             TriggerSearch(immediate: true);
         }
     }
+
+    public bool IsDuplicatesTab
+    {
+        get => !_onlyEmptyItems && _onlyDuplicates;
+        set { if (value) ActivateDuplicatesTab(); }
+    }
+
+    public bool IsFastSearchTab
+    {
+        get => !_onlyEmptyItems && !_onlyDuplicates;
+        set { if (value) ActivateFastSearchTab(); }
+    }
+
+    public bool IsEmptyItemsTab
+    {
+        get => _onlyEmptyItems;
+        set { if (value) ActivateEmptyItemsTab(); }
+    }
+
+    public void ActivateDuplicatesTab()
+    {
+        _onlyEmptyItems = false;
+        _onlyDuplicates = true;
+        _groupMode = true;
+        _searchPath = false;
+        RaiseTabState();
+        TriggerSearch(immediate: true);
+    }
+
+    public void ActivateFastSearchTab()
+    {
+        _onlyEmptyItems = false;
+        _onlyDuplicates = false;
+        _groupMode = false;
+        _searchPath = true;
+        RaiseTabState();
+        TriggerSearch(immediate: true);
+    }
+
+    public void ActivateEmptyItemsTab()
+    {
+        _onlyEmptyItems = true;
+        _groupMode = true;
+        _searchPath = true;
+        RaiseTabState();
+        TriggerSearch(immediate: true);
+    }
+
+    internal void RaiseTabState()
+    {
+        Raise(nameof(OnlyEmptyItems));
+        Raise(nameof(OnlyDuplicates));
+        Raise(nameof(GroupMode));
+        Raise(nameof(SearchPath));
+        Raise(nameof(IsDuplicatesTab));
+        Raise(nameof(IsFastSearchTab));
+        Raise(nameof(IsEmptyItemsTab));
+        Raise(nameof(SearchPlaceholderText));
+    }
+
+    public string SearchPlaceholderText => IsFastSearchTab
+        ? "hızlı dosya ve klasör yolu ara…  örn. Belgeler\\2026 fatura"
+        : IsEmptyItemsTab
+            ? "boş klasör veya 0 KB dosya ara…"
+            : "çift kopyalarda dosya adı veya uzantı ara…  örn. fatura";
 
     private bool _groupMode = true;
     public bool GroupMode
@@ -439,6 +507,12 @@ public sealed partial class MainViewModel : BindableBase
             ResultSummary = $"{HumanSize.Number(result.EmptyFolderCount)} boş klasör · {HumanSize.Number(result.ZeroByteFileCount)} sıfır KB dosya";
             SectionTitle = "Boş klasör ve 0 KB dosyalar";
             SectionMeta = $"{HumanSize.Number(result.EmptyFolderCount)} boş klasör · {HumanSize.Number(result.ZeroByteFileCount)} sıfır KB dosya";
+        }
+        else if (IsFastSearchTab)
+        {
+            ResultSummary = $"{HumanSize.Number(result.MatchedCount)} dosya · yolda ve adda arama";
+            SectionTitle = "Hızlı dosya arama (ad + klasör yolu)";
+            SectionMeta = $"{HumanSize.Number(result.Files.Count)} dosya gösteriliyor";
         }
         else
         {

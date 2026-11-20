@@ -264,6 +264,27 @@ try
     var deletedEmpty = FileDeleter.Delete(emptyTargets, DeleteMode.Permanent);
     Check("boş klasörler ve 0 KB dosya onaylı silinir",
         deletedEmpty.Deleted.Count == 3 && !Directory.Exists(emptyDir1) && !Directory.Exists(emptyDir2) && !File.Exists(zeroFile) && File.Exists(normalFile));
+
+    var cmpA = Path.Combine(temp, "ayni1.txt");
+    var cmpB = Path.Combine(temp, "ayni2.txt");
+    var cmpC = Path.Combine(temp, "farkli.txt");
+    File.WriteAllText(cmpA, "merhaba ikiz");
+    File.WriteAllText(cmpB, "merhaba ikiz");
+    File.WriteAllText(cmpC, "baska icerik");
+    File.SetLastWriteTimeUtc(cmpA, new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+    File.SetLastWriteTimeUtc(cmpB, new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+
+    var itemA = new FileItem { Id = 301, FullPath = cmpA, Name = "ayni1.txt", Directory = temp, Extension = "txt", Size = 12 };
+    var itemB = new FileItem { Id = 302, FullPath = cmpB, Name = "ayni2.txt", Directory = temp, Extension = "txt", Size = 12 };
+    var itemC = new FileItem { Id = 303, FullPath = cmpC, Name = "farkli.txt", Directory = temp, Extension = "txt", Size = 12 };
+
+    var sameReport = FileComparer.Compare(new[] { itemA, itemB });
+    Check("SHA-256 birebir aynı içerik algılanır",
+        sameReport.AllIdenticalContent && sameReport.DistinctHashCount == 1 && sameReport.Entries[0].IsOldest && sameReport.Entries[1].IsNewest);
+
+    var diffReport = FileComparer.Compare(new[] { itemA, itemC });
+    Check("SHA-256 farklı içerik algılanır",
+        !diffReport.AllIdenticalContent && diffReport.DistinctHashCount == 2);
 }
 finally
 {

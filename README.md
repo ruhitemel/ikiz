@@ -14,7 +14,9 @@ Windows için hızlı dosya arama ve çift kopya temizleme aracı. Everything be
 - **Hızlı çoklu seçim** — satır kutuları, **Tümünü seç** / **Kopyaları seç** / **Boş / 0 KB seç**; seçimi tek seferde panoya alma, silme veya toplu adlandırma.
 - **Boş klasör ve 0 KB temizleme** — boş klasörleri ve 0 KB dosyaları tek tıkla filtreler ve aynı onaylı Geri Dönüşüm Kutusu / pano mantığıyla temizler.
 - **Esnek silme** — yalnızca bu dosya, diğer kopyalar (seçili dosya kalır) veya tüm kopyalar (diskte hiç kalmaz).
-- **Sağ tık menüsü** — panoya ekle/çıkar, adı düzenle, toplu yeniden adlandırma, silme ve son silmeyi geri alma.
+- **Üç sabit sekme** — **Çift Kopyalar**, **Hızlı Dosya Arama** (dosya adı + klasör yolu araması) ve **Boş Klasör ve 0 KB** sekmeleriyle karmaşasız, sabit arayüz.
+- **SHA-256 karşılaştırma ekranı** — silmeden önce kesin emin olmak için dosyaların gerçek içerik parmak izini (SHA-256), tam bayt boyutunu, tarihini ve önizlemesini karşılaştırır; **En eskiyi koru** / **En yeniyi koru** kısayolları sunar.
+- **Sağ tık menüsü** — **Dosya konumunu aç (Klasörde göster)**, **Kayıtlı olduğu klasörü aç**, **Karşılaştır…**, panoya ekle/çıkar, adı düzenle, toplu yeniden adlandırma, silme ve son silmeyi geri alma.
 - **Açık/koyu tema** — Windows tercihiyle başlar, seçim kalıcıdır.
 - **Canlı tarama ilerlemesi** — animasyonlu ilerleme çubuğu, dosya sayısı, geçen süre, anlık hız ve tahmini kalan süre.
 - **Paylaşım öncesi gizlilik denetimi** — kişisel veri içermediğini madde madde doğrular; temiz özeti panoya kopyalar.

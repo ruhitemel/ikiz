@@ -2,6 +2,17 @@
 
 Bu dosya [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) biçimini izler. Sürüm numaraları [Semantic Versioning](https://semver.org/lang/tr/) kullanır.
 
+## [1.4.0] - 2026-11-20
+
+### Eklendi
+
+- **Üç sabit sekme (sade arayüz)** — üst çubukta kalabalık anahtarlar yerine **Çift Kopyalar**, **Hızlı Dosya Arama** (hem dosya adında hem klasör yolunda anlık arama) ve **Boş Klasör ve 0 KB** sabit sekmeleri.
+- **SHA-256 dosya karşılaştırma ekranı** — sağ tık menüsündeki **Karşılaştır…** veya çoklu seçim çubuğundaki **Karşılaştır** düğmesiyle açılır; dosyaların gerçek içeriklerini **SHA-256 parmak izi**, tam bayt boyutu, değiştirilme tarihi ve önizleme metniyle karşılaştırır (`%100 Birebir Aynı İçerik` veya `Dikkat: İçerikler Farklı`).
+- **En eskiyi / en yeniyi koru kısayolları** — karşılaştırma ekranında **En eskiyi koru** (asıl dosyayı bırakır, diğerlerini seçer) ve **En yeniyi koru** tek tık düğmeleriyle seçilenleri doğrudan panoya alma veya silme.
+- **Dosya konumunu aç (Klasörde göster)** — tüm dosya satırlarında, çift gruplarında, boş klasörlerde, 0 KB dosyalarda ve karşılaştırma ekranında sağ tık → **Dosya konumunu aç (Klasörde göster)** ve **Kayıtlı olduğu klasörü aç** seçenekleri.
+
+[1.4.0]: https://github.com/ruhitemel/ikiz/releases/tag/v1.4.0
+
 ## [1.3.0] - 2026-11-19
 
 ### Eklendi
